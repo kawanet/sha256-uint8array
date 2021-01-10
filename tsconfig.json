@@ -1,0 +1,22 @@
+{
+  "include": [
+    "./lib",
+    "./test"
+  ],
+  "compilerOptions": {
+    "module": "commonjs",
+    "noImplicitAny": true,
+    "noImplicitReturns": false,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "removeComments": false,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "target": "ES2018",
+    "types": [
+      "mocha",
+      "node"
+    ]
+  }
+}
