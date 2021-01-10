@@ -1,0 +1,22 @@
+{
+  "include": [
+    "../lib"
+  ],
+  "compilerOptions": {
+    "module": "commonjs",
+    "noImplicitAny": true,
+    "noImplicitReturns": false,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "removeComments": true,
+    "outDir": "../build",
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "target": "ES5",
+    "types": [
+      "mocha",
+      "node"
+    ]
+  }
+}
