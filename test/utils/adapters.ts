@@ -6,14 +6,16 @@ export interface Adapter {
     hash(str: string): string;
 }
 
+const isBrowser = ("undefined" !== typeof window);
+
 /**
  * https://github.com/kawanet/sha256-uint8array
  */
 
 export class SHA256Uint8Array implements Adapter {
-    private createHash = require("../../lib/sha256-uint8array").createHash;
-
-    // private createHash = require("../../dist/sha256-uint8array.min").createHash;
+    private createHash = isBrowser
+        ? require("../../dist/sha256-uint8array.min").createHash
+        : require("../../lib/sha256-uint8array").createHash;
 
     hash(str: string): string {
         return this.createHash("sha256").update(str).digest("hex");
@@ -49,10 +51,10 @@ export class CreateHash implements Adapter {
  */
 
 export class CryptoJs implements Adapter {
-    private SHA256 = require("crypto-js/sha256");
+    private CryptoJS = require("crypto-js");
 
     hash(str: string): string {
-        return this.SHA256(str).toString();
+        return this.CryptoJS.SHA256(str).toString();
     }
 }
 
@@ -91,5 +93,17 @@ export class ShaJS implements Adapter {
 
     hash(str: string): string {
         return new this.sha256().update(str).digest("hex");
+    }
+}
+
+/**
+ * https://github.com/indutny/hash.js
+ */
+
+export class HashJs implements Adapter {
+    private sha256 = require("hash.js/lib/hash/sha/256");
+
+    hash(str: string): string {
+        return this.sha256().update(str).digest('hex');
     }
 }

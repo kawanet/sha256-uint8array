@@ -8,25 +8,22 @@ const TESTNAME = __filename.replace(/^.*\//, "");
 
 const isBrowser = ("undefined" !== typeof window);
 
-const REPEAT = process.env.REPEAT || (isBrowser ? 100 : 100);
+const REPEAT = process.env.REPEAT || (isBrowser ? 10000 : 10000);
 
 describe(TESTNAME, () => {
-    const expects = {} as { [length: string]: string };
+    const sampleJSON = JSON.stringify(require("../package.json"));
+    const expectJSON = (new A.Crypto()).hash(sampleJSON);
 
-    before(() => {
-        const adapter = new A.Crypto();
-
-        for (let i = 1; i < MAKURANOSOSHI.length; i++) {
-            const input = MAKURANOSOSHI.substring(0, i);
-            expects[i] = adapter.hash(input);
-        }
-    });
+    const sampleUTF8 = MAKURANOSOSHI;
+    const expectUTF8 = (new A.Crypto()).hash(sampleUTF8);
 
     runTests("crypto", new A.Crypto());
 
     runTests("crypto-js", new A.CryptoJs());
 
     runTests("create-hash/browser", new A.CreateHash());
+
+    runTests("hash.js", new A.HashJs());
 
     runTests("jssha", new A.JsSHA());
 
@@ -40,11 +37,9 @@ describe(TESTNAME, () => {
         it(title, function () {
             this.timeout(10000);
 
-            for (let repeat = 1; repeat < REPEAT; repeat++) {
-                for (let i = 1; i < MAKURANOSOSHI.length; i++) {
-                    const input = MAKURANOSOSHI.substring(0, i);
-                    assert.equal(adapter.hash(input), expects[i], `${i} characters`);
-                }
+            for (let i = 0; i < REPEAT; i++) {
+                assert.equal(adapter.hash(sampleJSON), expectJSON);
+                assert.equal(adapter.hash(sampleUTF8), expectUTF8);
             }
         });
     }

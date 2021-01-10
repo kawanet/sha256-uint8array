@@ -31,13 +31,14 @@ Node.js's native `crypto` module run faster than others on Node.js.
 
 |module|version|node.js V14|Chrome 87|Safari 14|minified|backend|note|
 |---|---|---|---|---|---|---|---|
-|[crypto](https://nodejs.org/api/crypto.html)|-|124ms 👍|-|-|-|OpenSSL|👍 on node.js|
-|[sha256-uint8array](http://github.com/kawanet/sha256-uint8array)|0.8.0|289ms|498ms 👍|260ms 👍|3KB 👍|Uint8Array|👍 on browsers|
-|[jssha](https://npmjs.com/package/jssha)|3.2.0|654ms|743ms|812ms|10KB|Uint8Array|jssha/dist/sha256.js|
-|[jshashes](https://npmjs.com/package/jshashes)|1.0.8|1,289ms|1,899ms|987ms|23KB|Array|jshashes/hashes.js|
-|[sha.js](https://npmjs.com/package/sha.js)|2.4.11|330ms|760ms|3,344ms|27KB|Buffer|sha.js/sha256.js|
-|[create-hash](https://npmjs.com/package/create-hash)|1.2.0|409ms|811ms|3,384ms|97KB|Buffer|create-hash/browser.js|
-|[crypto-js](https://npmjs.com/package/crypto-js)|4.0.0|827ms|914ms|3,401ms|6KB|Buffer|crypto-js/sha256.js|
+|[crypto](https://nodejs.org/api/crypto.html)|-|99ms 👍|-|-|-|OpenSSL|👍 on node.js|
+|[sha256-uint8array](http://github.com/kawanet/sha256-uint8array)|0.8.0|261ms|474ms 👍|270ms 👍|3KB 👍|Uint8Array|👍 on browsers|
+|[crypto-js](https://npmjs.com/package/crypto-js)|4.0.0|835ms|928ms|957ms|108KB|Uint8Array|crypto-js/sha256.js|
+|[jssha](https://npmjs.com/package/jssha)|3.2.0|852ms|937ms|950ms|10KB|Uint8Array|jssha/dist/sha256.js|
+|[hash.js](https://www.npmjs.com/package/hash.js)|1.1.7|654ms|631ms|1,641ms|7KB|Array|hash.js/lib/hash/sha/1.js|
+|[sha.js](https://npmjs.com/package/sha.js)|2.4.11|351ms|731ms|3,617ms|27KB|Buffer|sha.js/sha256.js|
+|[create-hash](https://npmjs.com/package/create-hash)|1.2.0|404ms|788ms|3,640ms|97KB|Buffer|create-hash/browser.js|
+|[jshashes](https://npmjs.com/package/jshashes)|1.0.8|1,532ms|2,335ms|1,128ms|23KB|Array|jshashes/hashes.js|
 
 The benchmark result above is tested on macOS 10.15.7 Intel Core i7 3.2GHz. You could run the benchmark as below.
 
@@ -47,7 +48,7 @@ npm install
 npm run build
 
 # run the benchmark on Node.js
-REPEAT=100 ./node_modules/.bin/mocha test/99.benchmark.js
+REPEAT=10000 ./node_modules/.bin/mocha test/99.benchmark.js
 
 # run tests and the benchmark on browser
 make -C browser test
@@ -73,8 +74,9 @@ make -C browser test
 
 ## LINKS
 
-- https://github.com/kawanet/sha256-uint8array
 - https://www.npmjs.com/package/sha256-uint8array
+- https://github.com/kawanet/sha256-uint8array
+- https://github.com/kawanet/sha256-uint8array/blob/main/types/sha256-uint8array.d.ts
 
 ## MIT LICENSE
 
