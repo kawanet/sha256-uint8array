@@ -11,11 +11,11 @@ Fast SHA-256 digest hash based on Uint8Array, pure JavaScript.
 const createHash = require("sha256-uint8array").createHash;
 
 const text = "";
-const hex = createHash("sha256").update(text).digest("hex");
+const hex = createHash().update(text).digest("hex");
 // => "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
 const data = new Uint8Array(0);
-const hash = createHash("sha256").update(data).digest();
+const hash = createHash().update(data).digest();
 // => <Uint8Array e3 b0 c4 42 98 fc 1c 14 9a fb f4 c8 99 6f b9 24 27 ae 41 e4 64 9b 93 4c a4 95 99 1b 78 52 b8 55>
 ```
 
@@ -63,11 +63,11 @@ make -C browser test
 <script src="https://cdn.jsdelivr.net/npm/sha256-uint8array/dist/sha256-uint8array.min.js"></script>
 <script>
   const text = "";
-  const hex = SHA256.createHash("sha256").update(text).digest("hex");
+  const hex = SHA256.createHash().update(text).digest("hex");
   // => "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
   const data = new Uint8Array(0);
-  const hash = SHA256.createHash("sha256").update(data).digest();
+  const hash = SHA256.createHash().update(data).digest();
   // => <Uint8Array e3 b0 c4 42 98 fc 1c 14 9a fb f4 c8 99 6f b9 24 27 ae 41 e4 64 9b 93 4c a4 95 99 1b 78 52 b8 55>
 </script>
 ```
