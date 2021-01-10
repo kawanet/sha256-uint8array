@@ -47,9 +47,9 @@
     <h1>sha256-uint8array live demo</h1>
 
     <textarea id="source" autofocus
-              onfocus="this.form.digest.value = SHA256.createHash('sha256').update(this.form.source.value).digest('hex')"
-              onkeyup="this.form.digest.value = SHA256.createHash('sha256').update(this.form.source.value).digest('hex')"
-              onchange="this.form.digest.value = SHA256.createHash('sha256').update(this.form.source.value).digest('hex')"
+              onfocus="this.form.digest.value = SHA256.createHash().update(this.form.source.value).digest('hex')"
+              onkeyup="this.form.digest.value = SHA256.createHash().update(this.form.source.value).digest('hex')"
+              onchange="this.form.digest.value = SHA256.createHash().update(this.form.source.value).digest('hex')"
     ></textarea>
 
     <center>↓</center>
