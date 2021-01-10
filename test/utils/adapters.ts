@@ -18,7 +18,7 @@ export class SHA256Uint8Array implements Adapter {
         : require("../../lib/sha256-uint8array").createHash;
 
     hash(str: string): string {
-        return this.createHash("sha256").update(str).digest("hex");
+        return this.createHash().update(str).digest("hex");
     }
 }
 
