@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>sha256-uint8array live demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script src="https://cdn.jsdelivr.net/npm/sha256-uint8array/dist/sha256-uint8array.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: arial, sans-serif;
+            padding: 1em;
+        }
+
+        center, footer {
+            margin: 1em 0;
+            padding: 0;
+        }
+
+        textarea {
+            width: 100%;
+            height: 10em;
+            display: block;
+            font-size: 120%;
+            background: #eee;
+            padding: 10px;
+            border: 2px solid black;
+        }
+
+        input {
+            width: 100%;
+            display: block;
+            font-size: 120%;
+            font-family: "Courier New", monospace;
+            background: #eee;
+            padding: 10px;
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+
+<form onsubmit="return false">
+    <h1>sha256-uint8array live demo</h1>
+
+    <textarea id="source" autofocus
+              onfocus="this.form.digest.value = SHA256.createHash('sha256').update(this.form.source.value).digest('hex')"
+              onkeyup="this.form.digest.value = SHA256.createHash('sha256').update(this.form.source.value).digest('hex')"
+              onchange="this.form.digest.value = SHA256.createHash('sha256').update(this.form.source.value).digest('hex')"
+    ></textarea>
+
+    <center>↓</center>
+
+    <input type="text" id="digest">
+
+    <footer>
+        <a href="https://github.com/kawanet/sha256-uint8array">https://github.com/kawanet/sha256-uint8array</a>
+    </footer>
+</form>
+</body>
+</html>
