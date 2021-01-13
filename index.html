@@ -4,7 +4,7 @@
     <meta charset="utf-8"/>
     <title>sha256-uint8array live demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <script src="../dist/sha256-uint8array.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sha256-uint8array/dist/sha256-uint8array.min.js"></script>
     <script>
         function update(form) {
             form.digest.value = SHA256.createHash().update(form.source.value).digest('hex');
