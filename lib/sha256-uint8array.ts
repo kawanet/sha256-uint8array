@@ -57,9 +57,9 @@ export class Hash {
     private G = 0x1f83d9ab | 0;
     private H = 0x5be0cd19 | 0;
 
-    private bytes: Uint8Array;
-    private words: Int32Array;
-    private cursor = 0;
+    private _byte: Uint8Array;
+    private _word: Int32Array;
+    private _size = 0;
 
     constructor() {
         if (!sharedBuffer || sharedOffset >= N.allocTotal) {
@@ -67,8 +67,8 @@ export class Hash {
             sharedOffset = 0;
         }
 
-        this.bytes = new Uint8Array(sharedBuffer, sharedOffset, N.allocBytes);
-        this.words = new Int32Array(sharedBuffer, sharedOffset, N.allocWords);
+        this._byte = new Uint8Array(sharedBuffer, sharedOffset, N.allocBytes);
+        this._word = new Int32Array(sharedBuffer, sharedOffset, N.allocWords);
         sharedOffset += N.allocBytes;
     }
 
@@ -79,34 +79,34 @@ export class Hash {
             return this._utf8(data);
         }
 
-        const {bytes} = this;
-        const {length} = data;
+        const {_byte} = this;
+        const length = data.length;
 
         for (let offset = 0; offset < length;) {
-            const start = this.cursor % N.inputBytes;
+            const start = this._size % N.inputBytes;
             let index = start;
 
             while (offset < length && index < N.inputBytes) {
-                bytes[index++] = data[offset++];
+                _byte[index++] = data[offset++];
             }
 
             if (index >= N.inputBytes) {
                 this._block();
             }
 
-            this.cursor += index - start;
+            this._size += index - start;
         }
 
         return this;
     }
 
     private _utf8(text: string): this {
-        const {bytes, words} = this;
-        const {length} = text;
+        const {_byte, _word} = this;
+        const length = text.length;
         let surrogate = 0;
 
         for (let offset = 0; offset < length;) {
-            const start = this.cursor % N.inputBytes;
+            const start = this._size % N.inputBytes;
             let index = start;
 
             while (offset < length && index < N.inputBytes) {
@@ -114,23 +114,23 @@ export class Hash {
                 if (surrogate) {
                     // 4 bytes - surrogate pair
                     code = ((surrogate & 0x3FF) << 10) + (code & 0x3FF) + 0x10000;
-                    bytes[index++] = 0xF0 | (code >>> 18);
-                    bytes[index++] = 0x80 | ((code >>> 12) & 0x3F);
-                    bytes[index++] = 0x80 | ((code >>> 6) & 0x3F);
-                    bytes[index++] = 0x80 | (code & 0x3F);
+                    _byte[index++] = 0xF0 | (code >>> 18);
+                    _byte[index++] = 0x80 | ((code >>> 12) & 0x3F);
+                    _byte[index++] = 0x80 | ((code >>> 6) & 0x3F);
+                    _byte[index++] = 0x80 | (code & 0x3F);
                     surrogate = 0;
                 } else if (code < 0x80) {
                     // ASCII characters
-                    bytes[index++] = code;
+                    _byte[index++] = code;
                 } else if (code < 0x800) {
                     // 2 bytes
-                    bytes[index++] = 0xC0 | (code >>> 6);
-                    bytes[index++] = 0x80 | (code & 0x3F);
+                    _byte[index++] = 0xC0 | (code >>> 6);
+                    _byte[index++] = 0x80 | (code & 0x3F);
                 } else if (code < 0xD800 || code > 0xDFFF) {
                     // 3 bytes
-                    bytes[index++] = 0xE0 | (code >>> 12);
-                    bytes[index++] = 0x80 | ((code >>> 6) & 0x3F);
-                    bytes[index++] = 0x80 | (code & 0x3F);
+                    _byte[index++] = 0xE0 | (code >>> 12);
+                    _byte[index++] = 0x80 | ((code >>> 6) & 0x3F);
+                    _byte[index++] = 0x80 | (code & 0x3F);
                 } else {
                     // 4 bytes - surrogate pair
                     surrogate = code;
@@ -139,22 +139,22 @@ export class Hash {
 
             if (index >= N.inputBytes) {
                 this._block();
-                words[0] = words[N.inputWords];
+                _word[0] = _word[N.inputWords];
             }
 
-            this.cursor += index - start;
+            this._size += index - start;
         }
 
         return this;
     }
 
     private _block(): void {
-        const {words} = this;
+        const {_word} = this;
         let {A, B, C, D, E, F, G, H} = this;
         let i;
 
         for (i = 0; i < N.inputWords; i++) {
-            W[i] = swap32(words[i]);
+            W[i] = swap32(_word[i]);
         }
 
         for (i = N.inputWords; i < N.workWords; i++) {
@@ -187,22 +187,22 @@ export class Hash {
     digest(): Uint8Array;
     digest(encoding: string): string;
     digest(encoding?: string) {
-        const {bytes, words} = this;
-        const index = this.cursor % N.inputBytes;
+        const {_byte, _word} = this;
+        const index = this._size % N.inputBytes;
 
-        bytes[index] = 0x80;
-        bytes.fill(0, index + 1);
+        _byte[index] = 0x80;
+        _byte.fill(0, index + 1);
 
         if (index >= N.finalSize) {
             this._block();
-            words.fill(0);
+            _word.fill(0);
         }
 
-        const bits64 = this.cursor * 8;
+        const bits64 = this._size * 8;
         const low32 = (bits64 & 0xffffffff) >>> 0;
         const high32 = (bits64 - low32) / 0x100000000;
-        if (high32) words[N.highIndex] = swap32(high32);
-        if (low32) words[N.lowIndex] = swap32(low32);
+        if (high32) _word[N.highIndex] = swap32(high32);
+        if (low32) _word[N.lowIndex] = swap32(low32);
 
         this._block();
 
@@ -216,18 +216,18 @@ export class Hash {
     }
 
     private _bin(): Uint8Array {
-        let {A, B, C, D, E, F, G, H, bytes, words} = this;
+        let {A, B, C, D, E, F, G, H, _byte, _word} = this;
 
-        words[0] = swap32(A);
-        words[1] = swap32(B);
-        words[2] = swap32(C);
-        words[3] = swap32(D);
-        words[4] = swap32(E);
-        words[5] = swap32(F);
-        words[6] = swap32(G);
-        words[7] = swap32(H);
+        _word[0] = swap32(A);
+        _word[1] = swap32(B);
+        _word[2] = swap32(C);
+        _word[3] = swap32(D);
+        _word[4] = swap32(E);
+        _word[5] = swap32(F);
+        _word[6] = swap32(G);
+        _word[7] = swap32(H);
 
-        return bytes.slice(0, 32);
+        return _byte.slice(0, 32);
     }
 }
 
