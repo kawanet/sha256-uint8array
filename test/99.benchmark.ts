@@ -17,30 +17,30 @@ describe(TESTNAME, () => {
     const sampleUTF8 = MAKURANOSOSHI;
     const expectUTF8 = (new A.Crypto()).hash(sampleUTF8);
 
-    runTests("crypto", new A.Crypto());
+    it("crypto", testFor(new A.Crypto()));
 
-    runTests("crypto-js", new A.CryptoJs());
+    it("sha256-uint8array", testFor(new A.SHA256Uint8Array()));
 
-    runTests("create-hash/browser", new A.CreateHash());
+    it("crypto-js", testFor(new A.CryptoJs()));
 
-    runTests("hash.js", new A.HashJs());
+    it("jssha", testFor(new A.JsSHA()));
 
-    runTests("jssha", new A.JsSHA());
+    it("hash.js", testFor(new A.HashJs()));
 
-    runTests("jshashes", new A.JsHashes());
+    it("sha.js", testFor(new A.ShaJS()));
 
-    runTests("sha.js", new A.ShaJS());
+    it("create-hash/browser", testFor(new A.CreateHash()));
 
-    runTests("sha256-uint8array", new A.SHA256Uint8Array());
+    it("jshashes", testFor(new A.JsHashes()));
 
-    function runTests(title: string, adapter: A.Adapter) {
-        it(title, function () {
+    function testFor(adapter: A.Adapter) {
+        return function (this: Mocha.Context) {
             this.timeout(10000);
 
             for (let i = 0; i < REPEAT; i++) {
                 assert.equal(adapter.hash(sampleJSON), expectJSON);
                 assert.equal(adapter.hash(sampleUTF8), expectUTF8);
             }
-        });
+        };
     }
 });

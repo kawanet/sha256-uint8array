@@ -6,23 +6,25 @@ import * as A from "./utils/adapters";
 const TESTNAME = __filename.replace(/^.*\//, "");
 
 describe(TESTNAME, () => {
-    runTests("crypto", new A.Crypto());
+    it("crypto", testFor(new A.Crypto()));
 
-    runTests("crypto-js", new A.CryptoJs());
+    it("sha256-uint8array", testFor(new A.SHA256Uint8Array()));
 
-    runTests("create-hash/browser", new A.CreateHash());
+    it("crypto-js", testFor(new A.CryptoJs()));
 
-    runTests("jssha", new A.JsSHA());
+    it("jssha", testFor(new A.JsSHA()));
 
-    runTests("jshashes", new A.JsHashes());
+    it("hash.js", testFor(new A.HashJs()));
 
-    runTests("sha.js", new A.ShaJS());
+    it("sha.js", testFor(new A.ShaJS()));
 
-    runTests("sha256-uint8array", new A.SHA256Uint8Array());
+    it("create-hash/browser", testFor(new A.CreateHash()));
+
+    it("jshashes", testFor(new A.JsHashes()));
 });
 
-function runTests(title: string, adapter: A.Adapter) {
-    it(title, () => {
+function testFor(adapter: A.Adapter) {
+    return function (this: Mocha.Context) {
         {
             const input = ""; // 0 byte
             assert.equal(adapter.hash(input), "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "empty");
@@ -72,7 +74,7 @@ function runTests(title: string, adapter: A.Adapter) {
             const input = "El veloz murciélago hindú comía feliz cardillo y kiwi. La cigüeña tocaba el saxofón detrás del palenque de paja."; // 119 bytes
             assert.equal(adapter.hash(input), "c6574ab38b84d6c9967170995f4ff8f415f58e3e8740b0402f97cf7aacde6412", shorten(input));
         }
-    });
+    };
 }
 
 function shorten(str: string) {
