@@ -56,6 +56,9 @@ make -C browser test
 
 ## BROWSER
 
+The minified version of the library is also available for browsers via
+[jsDelivr](https://www.jsdelivr.com/package/npm/sha256-uint8array) CDN.
+
 - Live Demo https://kawanet.github.io/sha256-uint8array/
 - Minified https://cdn.jsdelivr.net/npm/sha256-uint8array/dist/sha256-uint8array.min.js
 
@@ -70,6 +73,38 @@ make -C browser test
   const hash = SHA256.createHash().update(data).digest();
   // => <Uint8Array e3 b0 c4 42 98 fc 1c 14 9a fb f4 c8 99 6f b9 24 27 ae 41 e4 64 9b 93 4c a4 95 99 1b 78 52 b8 55>
 </script>
+```
+
+## BROWSERIFY
+
+This works great with
+[browserify](https://www.npmjs.com/package/browserify)
+via `browser` property of `package.json` of your app if you needs
+`crypto.createHash("sha256").update(data).digest("hex");` syntax only.
+
+```json
+{
+  "browser": {
+    "crypto": "sha256-uint8array/dist/sha256-uint8array.min.js"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.0",
+    "sha256-uint8array": "^0.9.0",
+    "terser": "^5.5.1"
+  }
+}
+```
+
+It costs only less than 4KB, whereas `browserify`'s default `crypto` polyfill
+costs more than 300KB huge even after minified.
+
+```js
+// On Node.js, this loads Node.js's native crypto module which is faster.
+// On browsers, this uses sha256-uint8array.min.js which is small and fast.
+const crypto = require("crypto");
+
+const hash = crypto.createHash("sha256").update("").digest("hex");
+// => "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 ```
 
 ## LINKS
