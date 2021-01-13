@@ -60,6 +60,7 @@ export class Hash {
     private _byte: Uint8Array;
     private _word: Int32Array;
     private _size = 0;
+    private _sp = 0;
 
     constructor() {
         if (!sharedBuffer || sharedOffset >= N.allocTotal) {
@@ -103,7 +104,7 @@ export class Hash {
     private _utf8(text: string): this {
         const {_byte, _word} = this;
         const length = text.length;
-        let surrogate = 0;
+        let surrogate = this._sp;
 
         for (let offset = 0; offset < length;) {
             const start = this._size % N.inputBytes;
@@ -145,6 +146,7 @@ export class Hash {
             this._size += index - start;
         }
 
+        this._sp = surrogate;
         return this;
     }
 
