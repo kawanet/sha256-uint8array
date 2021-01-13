@@ -38,7 +38,7 @@ const algorithms: { [algorithm: string]: number } = {
 };
 
 export function createHash(algorithm?: string) {
-    if (algorithm && !algorithms[algorithm]) {
+    if (algorithm && !algorithms[algorithm] && !algorithms[algorithm.toLowerCase()]) {
         throw new Error("Digest method not supported");
     }
 
