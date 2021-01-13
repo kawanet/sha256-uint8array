@@ -4,7 +4,12 @@
     <meta charset="utf-8"/>
     <title>sha256-uint8array live demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <script src="https://cdn.jsdelivr.net/npm/sha256-uint8array/dist/sha256-uint8array.min.js"></script>
+    <script src="../dist/sha256-uint8array.min.js"></script>
+    <script>
+        function update(form) {
+            form.digest.value = SHA256.createHash().update(form.source.value).digest('hex');
+        }
+    </script>
     <style>
         * {
             box-sizing: border-box;
@@ -46,11 +51,7 @@
 <form onsubmit="return false">
     <h1>sha256-uint8array live demo</h1>
 
-    <textarea id="source" autofocus
-              onfocus="this.form.digest.value = SHA256.createHash().update(this.form.source.value).digest('hex')"
-              onkeyup="this.form.digest.value = SHA256.createHash().update(this.form.source.value).digest('hex')"
-              onchange="this.form.digest.value = SHA256.createHash().update(this.form.source.value).digest('hex')"
-    ></textarea>
+    <textarea id="source" autofocus onfocus="update(this.form)" onkeyup="update(this.form)" onchange="update(this.form)"></textarea>
 
     <center>↓</center>
 
