@@ -68,12 +68,12 @@ describe(TESTNAME, () => {
 
     it("UTF-8 characters", () => {
         const input = MAKURANOSOSHI;
-        assert.equal(crypto.createHash("sha256").update(input).digest("hex"), "f69ab550d0df465e5b2c8bfa589f58c9d464b10279172b67107afd5e205a7644", "crypto");
-        assert.equal(createHash().update(input).digest("hex"), "f69ab550d0df465e5b2c8bfa589f58c9d464b10279172b67107afd5e205a7644", "single text at once");
+        assert.equal(crypto.createHash("sha256").update(input).digest("hex"), "d5ac150856a272a4af705f720054628f5099d69e77a8074daa32f5eeff1b2d9c", "crypto");
+        assert.equal(createHash().update(input).digest("hex"), "d5ac150856a272a4af705f720054628f5099d69e77a8074daa32f5eeff1b2d9c", "single text at once");
 
         const hash = createHash("sha256");
         input.split(/(\n)/).forEach(s => hash.update(s));
-        assert.equal(hash.digest("hex"), "f69ab550d0df465e5b2c8bfa589f58c9d464b10279172b67107afd5e205a7644", "chunked text");
+        assert.equal(hash.digest("hex"), "d5ac150856a272a4af705f720054628f5099d69e77a8074daa32f5eeff1b2d9c", "chunked text");
     });
 });
 
