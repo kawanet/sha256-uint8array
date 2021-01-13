@@ -31,14 +31,14 @@ Node.js's native `crypto` module run faster than others on Node.js.
 
 |module|version|node.js V14|Chrome 87|Safari 14|minified|backend|note|
 |---|---|---|---|---|---|---|---|
-|[crypto](https://nodejs.org/api/crypto.html)|-|99ms 👍|-|-|-|OpenSSL|👍 on node.js|
-|[sha256-uint8array](http://github.com/kawanet/sha256-uint8array)|0.8.0|261ms|474ms 👍|270ms 👍|3KB 👍|Uint8Array|👍 on browsers|
-|[crypto-js](https://npmjs.com/package/crypto-js)|4.0.0|835ms|928ms|957ms|108KB|Uint8Array|crypto-js/sha256.js|
-|[jssha](https://npmjs.com/package/jssha)|3.2.0|852ms|937ms|950ms|10KB|Uint8Array|jssha/dist/sha256.js|
-|[hash.js](https://www.npmjs.com/package/hash.js)|1.1.7|654ms|631ms|1,641ms|7KB|Array|hash.js/lib/hash/sha/1.js|
-|[sha.js](https://npmjs.com/package/sha.js)|2.4.11|351ms|731ms|3,617ms|27KB|Buffer|sha.js/sha256.js|
-|[create-hash](https://npmjs.com/package/create-hash)|1.2.0|404ms|788ms|3,640ms|97KB|Buffer|create-hash/browser.js|
-|[jshashes](https://npmjs.com/package/jshashes)|1.0.8|1,532ms|2,335ms|1,128ms|23KB|Array|jshashes/hashes.js|
+|[crypto](https://nodejs.org/api/crypto.html)|-|103ms 👍|-|-|-|OpenSSL|👍 on node.js|
+|[sha256-uint8array](http://github.com/kawanet/sha256-uint8array)|0.9.0|274ms|446ms 👍|243ms 👍|3KB 👍|Uint8Array|👍 on browsers|
+|[crypto-js](https://npmjs.com/package/crypto-js)|4.0.0|805ms|910ms|918ms|108KB|Uint8Array|crypto-js/sha256.js|
+|[jssha](https://npmjs.com/package/jssha)|3.2.0|835ms|892ms|913ms|10KB|Uint8Array|jssha/dist/sha256.js|
+|[hash.js](https://www.npmjs.com/package/hash.js)|1.1.7|635ms|611ms|1,577ms|7KB|Array|hash.js/lib/hash/sha/1.js|
+|[sha.js](https://npmjs.com/package/sha.js)|2.4.11|356ms|965ms|3,512ms|27KB|Buffer|sha.js/sha256.js|
+|[create-hash](https://npmjs.com/package/create-hash)|1.2.0|381ms|1,002ms|3,502ms|97KB|Buffer|create-hash/browser.js|
+|[jshashes](https://npmjs.com/package/jshashes)|1.0.8|1,450ms|2,239ms|1,164ms|23KB|Array|jshashes/hashes.js|
 
 The benchmark result above is tested on macOS 10.15.7 Intel Core i7 3.2GHz. You could run the benchmark as below.
 
@@ -74,6 +74,7 @@ make -C browser test
 
 ## LINKS
 
+- https://www.npmjs.com/package/sha1-uint8array
 - https://www.npmjs.com/package/sha256-uint8array
 - https://github.com/kawanet/sha256-uint8array
 - https://github.com/kawanet/sha256-uint8array/blob/main/types/sha256-uint8array.d.ts

@@ -1,7 +1,7 @@
 {
   "name": "sha256-uint8array",
   "description": "Fast SHA-256 digest hash based on Uint8Array, pure JavaScript.",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "author": "Yusuke Kawasaki <u-suke@kawa.net>",
   "bugs": {
     "url": "https://github.com/kawanet/sha256-uint8array/issues"
