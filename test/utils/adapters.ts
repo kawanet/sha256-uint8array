@@ -6,6 +6,10 @@ export interface Adapter {
     hash(str: string): string;
 }
 
+export interface AsyncAdapter {
+    hash(str: string): Promise<string>;
+}
+
 const isBrowser = ("undefined" !== typeof window);
 
 /**
@@ -105,5 +109,23 @@ export class HashJs implements Adapter {
 
     hash(str: string): string {
         return this.sha256().update(str).digest('hex');
+    }
+}
+
+const hasSubtle = ("undefined" !== typeof crypto) && crypto.subtle && ("function" === typeof crypto.subtle.digest);
+const hasEncoder = ("function" === typeof TextEncoder);
+const toHex = (data: Uint8Array) => [].map.call(data, (num: number) => (num | 0x100).toString(16).substr(-2)).join("");
+
+/**
+ * https://developer.mozilla.org/docs/Web/API/SubtleCrypto
+ */
+
+export class SubtleCrypto {
+    static available = (hasSubtle && hasEncoder);
+
+    async hash(str: string): Promise<string> {
+        const data = new TextEncoder().encode(str);
+        const actual = await crypto.subtle.digest("SHA-256", data);
+        return toHex(new Uint8Array(actual));
     }
 }
