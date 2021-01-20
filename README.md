@@ -44,6 +44,7 @@ The benchmark result above is tested on macOS 10.15.7 Intel Core i7 3.2GHz. You 
 
 ```sh
 git clone https://github.com/kawanet/sha256-uint8array.git
+cd sha256-uint8array
 npm install
 npm run build
 
@@ -51,7 +52,8 @@ npm run build
 REPEAT=10000 ./node_modules/.bin/mocha test/99.benchmark.js
 
 # run tests and the benchmark on browser
-make -C browser test
+make -C browser
+open browser/test.html
 ```
 
 ## BROWSER
