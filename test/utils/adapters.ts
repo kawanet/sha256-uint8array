@@ -2,15 +2,24 @@
  * An interface which has digest() method
  */
 
+import {arrayToHex} from "./utils";
+
 export interface Adapter {
-    hash(data: string | Uint8Array): string;
+    noString?: boolean;
+    noBinary?: boolean;
+    noDataView?: boolean;
+
+    hash(data: string | Uint8Array | ArrayBufferView): string;
 }
 
 export interface AsyncAdapter {
-    hash(data: string | Uint8Array): Promise<string>;
+    noBinary?: boolean;
+
+    hash(data: Uint8Array): Promise<string>;
 }
 
 const isBrowser = ("undefined" !== typeof window);
+const hasSubtle = ("undefined" !== typeof crypto) && crypto.subtle && ("function" === typeof crypto.subtle.digest);
 
 /**
  * https://github.com/kawanet/sha256-uint8array
@@ -21,7 +30,7 @@ export class SHA256Uint8Array implements Adapter {
         ? require("../../dist/sha256-uint8array.min").createHash
         : require("../../lib/sha256-uint8array").createHash;
 
-    hash(data: string | Uint8Array): string {
+    hash(data: string | Uint8Array | ArrayBufferView): string {
         return this.createHash().update(data).digest("hex");
     }
 }
@@ -32,8 +41,10 @@ export class SHA256Uint8Array implements Adapter {
 
 export class Crypto implements Adapter {
     private crypto = require("crypto");
+    noString = isBrowser;
+    noBinary = isBrowser;
 
-    hash(data: string | Uint8Array): string {
+    hash(data: string | Uint8Array | ArrayBufferView): string {
         return this.crypto.createHash("sha256").update(data).digest("hex");
     }
 }
@@ -46,6 +57,7 @@ export class Crypto implements Adapter {
 
 export class CreateHash implements Adapter {
     private createHash = require("create-hash/browser");
+    noDataView = true;
 
     hash(data: string | Uint8Array): string {
         return this.createHash("sha256").update(data).digest("hex");
@@ -58,9 +70,9 @@ export class CreateHash implements Adapter {
 
 export class CryptoJs implements Adapter {
     private CryptoJS = require("crypto-js");
+    noBinary = true;
 
-    hash(data: string | Uint8Array): string {
-        if ("string" !== typeof data) throw new TypeError("Type not supported: " + typeof data);
+    hash(data: string): string {
         return this.CryptoJS.SHA256(data).toString();
     }
 }
@@ -71,9 +83,9 @@ export class CryptoJs implements Adapter {
 
 export class JsHashes implements Adapter {
     private Hashes = require("jshashes");
+    noBinary = true;
 
-    hash(data: string | Uint8Array): string {
-        if ("string" !== typeof data) throw new TypeError("Type not supported: " + typeof data);
+    hash(data: string): string {
         return new this.Hashes.SHA256().hex(data);
     }
 }
@@ -84,6 +96,7 @@ export class JsHashes implements Adapter {
 
 export class JsSHA implements Adapter {
     private sha256 = require("jssha/dist/sha256");
+    noDataView = true;
 
     hash(data: string | Uint8Array): string {
         const type = ("string" === typeof data) ? "TEXT" : "UINT8ARRAY";
@@ -99,6 +112,7 @@ export class JsSHA implements Adapter {
 
 export class ShaJS implements Adapter {
     private sha256 = require("sha.js/sha256");
+    noDataView = true;
 
     hash(data: string | Uint8Array): string {
         return new this.sha256().update(data).digest("hex");
@@ -111,6 +125,7 @@ export class ShaJS implements Adapter {
 
 export class HashJs implements Adapter {
     private sha256 = require("hash.js/lib/hash/sha/256");
+    noDataView = true;
 
     hash(data: string | Uint8Array): string {
         return this.sha256().update(data).digest('hex');
@@ -122,21 +137,11 @@ export class HashJs implements Adapter {
  */
 
 export class SubtleCrypto implements AsyncAdapter {
-    static available = ("undefined" !== typeof crypto) && crypto.subtle && ("function" === typeof crypto.subtle.digest);
+    noString = true;
+    noBinary = !hasSubtle;
 
-    async hash(data: string | Uint8Array): Promise<string> {
-        if ("string" === typeof data) throw new TypeError("Type not supported: " + typeof data);
+    async hash(data: Uint8Array): Promise<string> {
         const digest = await crypto.subtle.digest("SHA-256", data);
-        return arrayBufferToHex(digest);
+        return arrayToHex(new Uint8Array(digest));
     }
-}
-
-function arrayBufferToHex(data: ArrayBuffer): string {
-    const length = data.byteLength;
-    const uint8 = new Uint8Array(data);
-    let hex = "";
-    for (let i = 0; i < length; i++) {
-        hex += (uint8[i] | 0x100).toString(16).substr(-2);
-    }
-    return hex;
 }

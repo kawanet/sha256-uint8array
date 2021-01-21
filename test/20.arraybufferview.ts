@@ -2,12 +2,13 @@
 
 import {strict as assert} from "assert";
 import {createHash} from "../lib/sha256-uint8array";
+import {stringToArrayBuffer} from "./utils/utils";
 
 const TITLE = __filename.split("/").pop();
 
 describe(TITLE, () => {
-    const expected = createHash().update("ABCDEFGH").digest("hex");
-    const buffer = ArrayBufferFromString("ABCDEFGH");
+    const buffer = stringToArrayBuffer("ABCDEFGH");
+    const expected = "9ac2197d9258257b1ae8463e4214e4cd0a578bc1517f2415928b91be4283fc48";
 
     it("Int8Array", () => {
         const data = new Int8Array(buffer);
@@ -64,13 +65,3 @@ describe(TITLE, () => {
         }
     }
 });
-
-function ArrayBufferFromString(str: string) {
-    str = unescape(encodeURIComponent(str));
-    const buffer = new ArrayBuffer(str.length);
-    const data = new Uint8Array(buffer);
-    for (let i = 0; i < str.length; i++) {
-        data[i] = str.charCodeAt(i);
-    }
-    return buffer;
-}

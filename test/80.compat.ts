@@ -2,10 +2,11 @@
 
 import {strict as assert} from "assert";
 import * as A from "./utils/adapters";
+import {arrayToArrayBuffer} from "./utils/utils";
 
-const TESTNAME = __filename.replace(/^.*\//, "");
+const TITLE = __filename.split("/").pop();
 
-describe(TESTNAME, () => {
+describe(TITLE, () => {
     it("crypto", testFor(new A.Crypto()));
 
     it("sha256-uint8array", testFor(new A.SHA256Uint8Array()));
@@ -25,6 +26,8 @@ describe(TESTNAME, () => {
 
 function testFor(adapter: A.Adapter) {
     return function (this: Mocha.Context) {
+        if (adapter.noString) return this.skip();
+
         {
             const input = ""; // 0 byte
             assert.equal(adapter.hash(input), "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "empty");
@@ -73,6 +76,24 @@ function testFor(adapter: A.Adapter) {
         {
             const input = "El veloz murciélago hindú comía feliz cardillo y kiwi. La cigüeña tocaba el saxofón detrás del palenque de paja."; // 119 bytes
             assert.equal(adapter.hash(input), "c6574ab38b84d6c9967170995f4ff8f415f58e3e8740b0402f97cf7aacde6412", shorten(input));
+        }
+
+        if (!adapter.noBinary) {
+            const buffer = arrayToArrayBuffer([0, 1, 126, 127, 128, 129, 254, 255]);
+            const expected = "22b44ea02cb8ae041867a7bddffc3c610b098d761cc8c3b21bcdff63af67ee3c";
+
+            {
+                assert.equal(adapter.hash(new Uint8Array(buffer)), expected);
+            }
+
+            if (!adapter.noDataView) {
+                assert.equal(adapter.hash(new Int8Array(buffer)), expected);
+                assert.equal(adapter.hash(new Int16Array(buffer)), expected);
+                assert.equal(adapter.hash(new Int32Array(buffer)), expected);
+                assert.equal(adapter.hash(new Uint16Array(buffer)), expected);
+                assert.equal(adapter.hash(new Uint32Array(buffer)), expected);
+                assert.equal(adapter.hash(new DataView(buffer)), expected);
+            }
         }
     };
 }
