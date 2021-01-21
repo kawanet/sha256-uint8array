@@ -40,6 +40,8 @@ export class Crypto implements Adapter {
 
 /**
  * https://www.npmjs.com/package/create-hash
+ *
+ * Note: create-hash/browser calls sha.js internally.
  */
 
 export class CreateHash implements Adapter {

@@ -29,7 +29,6 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
         it("jssha", testFor(new A.JsSHA()));
         it("hash.js", testFor(new A.HashJs()));
         it("sha.js", testFor(new A.ShaJS()));
-        it("create-hash/browser", testFor(new A.CreateHash()));
         it("jshashes", testFor(new A.JsHashes()));
     });
 
@@ -41,7 +40,6 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
         it("jssha", testBinary(new A.JsSHA()));
         it("hash.js", testBinary(new A.HashJs()));
         it("sha.js", testBinary(new A.ShaJS()));
-        it("create-hash/browser", testBinary(new A.CreateHash()));
         it.skip("jshashes", testBinary(new A.JsHashes()));
         (A.SubtleCrypto.available ? it : it.skip)("crypto.subtle.digest()", testAsync(new A.SubtleCrypto()));
     });
