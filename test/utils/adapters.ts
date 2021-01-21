@@ -19,6 +19,7 @@ export interface AsyncAdapter {
 }
 
 const isBrowser = ("undefined" !== typeof window);
+const isLegacy = ("function" !== typeof TextEncoder);
 const hasSubtle = ("undefined" !== typeof crypto) && crypto.subtle && ("function" === typeof crypto.subtle.digest);
 
 /**
@@ -129,6 +130,23 @@ export class HashJs implements Adapter {
 
     hash(data: string | Uint8Array): string {
         return this.sha256().update(data).digest('hex');
+    }
+}
+
+/**
+ * https://www.npmjs.com/package/@aws-crypto/sha256-js
+ * https://github.com/aws/aws-sdk-js-crypto-helpers/tree/master/packages/sha256-js
+ */
+
+export class AwsCrypto implements Adapter {
+    private Sha256 = (!isLegacy && require("@aws-crypto/sha256-js").Sha256);
+    noString = isLegacy;
+    noBinary = isLegacy;
+
+    hash(data: string | Uint8Array): string {
+        const hash = new this.Sha256();
+        hash.update(data);
+        return arrayToHex(hash.digestSync());
     }
 }
 

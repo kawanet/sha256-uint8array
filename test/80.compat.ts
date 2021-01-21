@@ -22,6 +22,8 @@ describe(TITLE, () => {
     it("create-hash/browser", testFor(new A.CreateHash()));
 
     it("jshashes", testFor(new A.JsHashes()));
+
+    it("@aws-crypto/sha256-js", testFor(new A.AwsCrypto()));
 });
 
 function testFor(adapter: A.Adapter) {

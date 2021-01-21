@@ -18,7 +18,8 @@ dist: ../dist/sha256-uint8array.min.js
 test-es5: dist ../build/lib/sha256-uint8array.js
 	cp ../package.json ../build
 	[ -d ../build/dist ] || ln -s ../dist ../build
-	../node_modules/.bin/browserify -o ../build/test.js ../build/test/*.js
+	../node_modules/.bin/browserify -o ../build/test.js ../build/test/*.js \
+		-u '../node_modules/@aws-crypto/sha256-js/build/index.js'
 
 ../build/lib/sha256-uint8array.js: ../lib/*.ts ../test/*.ts
 	../node_modules/.bin/tsc -p ../browser

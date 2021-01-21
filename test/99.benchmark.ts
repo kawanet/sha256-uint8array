@@ -31,6 +31,7 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
         it("hash.js", testFor(new A.HashJs()));
         it("sha.js", testFor(new A.ShaJS()));
         it("jshashes", testFor(new A.JsHashes()));
+        it.skip("@aws-crypto/sha256-js", testFor(new A.AwsCrypto()));
     });
 
     describe("input: Uint8Array => output: hex", () => {
@@ -42,7 +43,8 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
         it("hash.js", testBinary(new A.HashJs()));
         it("sha.js", testBinary(new A.ShaJS()));
         it("jshashes", testBinary(new A.JsHashes()));
-        it("crypto.subtle.digest()", testAsync(new A.SubtleCrypto()));
+        it.skip("@aws-crypto/sha256-js", testBinary(new A.AwsCrypto()));
+        it.skip("crypto.subtle.digest()", testAsync(new A.SubtleCrypto()));
     });
 
     function testFor(adapter: A.Adapter) {
