@@ -7,7 +7,8 @@ import {MAKURANOSOSHI} from "./utils/sample-text";
 const TITLE = __filename.split("/").pop();
 
 const isBrowser = ("undefined" !== typeof window);
-const REPEAT = process.env.REPEAT || (isBrowser ? 10000 : 10000);
+const isLegacy = ("function" !== typeof TextEncoder);
+const REPEAT = process.env.REPEAT || (isBrowser ? (isLegacy ? 1000 : 10000) : 10000);
 const SLEEP = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 const stringToArray = (str: string) => [].map.call(unescape(encodeURIComponent(str)), (c: string) => c.charCodeAt(0))
 
