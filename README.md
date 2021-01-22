@@ -27,7 +27,7 @@ for detail.
 
 It has a better compatibility with Node.js's `crypto` module in its smaller footprint.
 
-|module|string IN|Uint8Array IN|DataView IN|hex OUT|Uint8Array OUT|minified|
+|module|string IN|Uint8Array IN|TypedArray IN|hex OUT|Uint8Array OUT|minified|
 |---|---|---|---|---|---|---|
 |[crypto](https://nodejs.org/api/crypto.html)|✅ OK|✅ OK|✅ OK|✅ OK|✅ OK|-|
 |[sha256-uint8array](http://github.com/kawanet/sha256-uint8array)|✅ OK|✅ OK|✅ OK|✅ OK|✅ OK|4KB|
@@ -40,7 +40,11 @@ It has a better compatibility with Node.js's `crypto` module in its smaller foot
 |[@aws-crypto/sha256-js](https://www.npmjs.com/package/@aws-crypto/sha256-js)|✅ OK|✅ OK|🚫 NO|🚫 NO|✅ OK|14KB|
 |[crypto.subtle.digest()](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)|🚫 NO|✅ OK|✅ OK|🚫 NO|🚫 NO|-|
 
-## BENCHMARK
+The W3C standard `crypto.subtle.digest()` API has a different interface which
+[returns](https://github.com/microsoft/TypeScript/blob/master/lib/lib.dom.d.ts)
+`Promise<ArrayBuffer>`.
+
+## SPEED
 
 It runs well both on Node.js and browsers.
 Node.js's native `crypto` module definitely runs faster than any others on Node.js, though.
@@ -97,7 +101,7 @@ The minified version of the library is also available for browsers via
 
 ## BROWSERIFY
 
-This works great with
+It works great with
 [browserify](https://www.npmjs.com/package/browserify)
 via `browser` property of `package.json` of your app if you needs
 `crypto.createHash("sha256").update(data).digest("hex");` syntax only.
@@ -109,8 +113,7 @@ via `browser` property of `package.json` of your app if you needs
   },
   "devDependencies": {
     "browserify": "^17.0.0",
-    "sha256-uint8array": "^0.9.0",
-    "terser": "^5.5.1"
+    "sha256-uint8array": "^0.10.0"
   }
 }
 ```
