@@ -2,16 +2,16 @@
 
 import {strict as assert} from "assert";
 import * as crypto from "crypto";
-import {createHash} from "../lib/sha256-uint8array";
+import {createHash} from "../";
 
-const TESTNAME = __filename.replace(/^.*\//, "");
+const TITLE = __filename.split("/").pop();
 
 /**
  * Unicode's surrogate pair is a pair of 16bit characters in JavaScript.
  * The first half and the second may be separated to different chunks to input.
  */
 
-describe(TESTNAME, () => {
+describe(TITLE, () => {
 
     const emojis = [
         "\u{1F601}", // 😁 GRINNING FACE WITH SMILING EYES

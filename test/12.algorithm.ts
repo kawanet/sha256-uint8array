@@ -2,11 +2,11 @@
 
 import {strict as assert} from "assert";
 import * as crypto from "crypto";
-import {createHash} from "../lib/sha256-uint8array";
+import {createHash} from "../";
 
-const TESTNAME = __filename.replace(/^.*\//, "");
+const TITLE = __filename.split("/").pop();
 
-describe(TESTNAME, () => {
+describe(TITLE, () => {
     it('createHash("invalid")', () => {
         assert.throws(() => crypto.createHash("invalid"));
 

@@ -2,12 +2,12 @@
 
 import {strict as assert} from "assert";
 import * as crypto from "crypto";
-import {createHash} from "../lib/sha256-uint8array";
+import {createHash} from "../";
 import {MAKURANOSOSHI} from "./utils/sample-text";
 
-const TESTNAME = __filename.replace(/^.*\//, "");
+const TITLE = __filename.split("/").pop();
 
-describe(TESTNAME, () => {
+describe(TITLE, () => {
     it("0 byte to hex", () => {
         const input = ""; // 0 byte
 

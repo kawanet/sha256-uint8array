@@ -1,7 +1,7 @@
 #!/usr/bin/env mocha -R spec
 
 import {strict as assert} from "assert";
-import {createHash} from "../lib/sha256-uint8array";
+import {createHash} from "../";
 import {stringToArrayBuffer} from "./utils/utils";
 
 const TITLE = __filename.split("/").pop();

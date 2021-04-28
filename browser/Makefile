@@ -17,7 +17,8 @@ dist: ../dist/sha256-uint8array.min.js
 # ES5
 test-es5: dist ../build/lib/sha256-uint8array.js
 	cp ../package.json ../build
-	[ -d ../build/dist ] || ln -s ../dist ../build
+	perl -i -pe 's#require\("../"\)#require("../../dist/sha256-uint8array.min")#' ../build/test/*.js
+	perl -i -pe 's#require\("../../"\)#require("../../../dist/sha256-uint8array.min")#' ../build/test/*/*.js
 	../node_modules/.bin/browserify -o ../build/test.js ../build/test/*.js \
 		-u '../node_modules/@aws-crypto/sha256-js/build/index.js'
 
