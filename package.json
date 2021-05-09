@@ -53,6 +53,7 @@
     "build-test-es5": "make -C browser clean test-es5",
     "fixpack": "fixpack",
     "mocha": "./node_modules/.bin/mocha -R spec test/*.js",
+    "prepack": "npm run build-browser && REPEAT=1 npm test",
     "test": "npm run mocha"
   },
   "typings": "./types/sha256-uint8array.d.ts"
