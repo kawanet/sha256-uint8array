@@ -4,7 +4,7 @@ import {strict as assert} from "assert";
 import * as crypto from "crypto";
 import {createHash} from "../";
 
-const TITLE = __filename.split("/").pop();
+const TITLE = __filename.split("/").pop()!!;
 
 describe(TITLE, () => {
     it('createHash("invalid")', () => {
@@ -26,7 +26,7 @@ describe(TITLE, () => {
     });
 
     it('createHash(undefined)', () => {
-        assert.throws(() => crypto.createHash(undefined));
+        assert.throws(() => crypto.createHash(undefined as any));
 
         assert.doesNotThrow(() => createHash(undefined));
     });

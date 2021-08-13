@@ -5,7 +5,7 @@ import * as crypto from "crypto";
 import {createHash} from "../";
 import {MAKURANOSOSHI} from "./utils/sample-text";
 
-const TITLE = __filename.split("/").pop();
+const TITLE = __filename.split("/").pop()!!;
 
 describe(TITLE, () => {
     it("0 byte to hex", () => {

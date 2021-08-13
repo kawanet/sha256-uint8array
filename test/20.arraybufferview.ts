@@ -4,7 +4,7 @@ import {strict as assert} from "assert";
 import {createHash} from "../";
 import {stringToArrayBuffer} from "./utils/utils";
 
-const TITLE = __filename.split("/").pop();
+const TITLE = __filename.split("/").pop()!!;
 
 describe(TITLE, () => {
     const buffer = stringToArrayBuffer("ABCDEFGH");
@@ -47,12 +47,12 @@ describe(TITLE, () => {
     });
 
     it("null", () => {
-        assert.throws(() => createHash().update(null));
+        assert.throws(() => createHash().update(null as any));
         assert.doesNotThrow(() => createHash().update(""));
     });
 
     function testFor(offset: number) {
-        return function (this: Mocha.Context) {
+        return function (this: Mocha.Context): void {
             const word = new Uint8Array(buffer, offset, 4).slice();
             const expected = createHash().update(word).digest("hex");
 

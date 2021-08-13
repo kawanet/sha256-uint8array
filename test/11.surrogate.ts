@@ -4,7 +4,7 @@ import {strict as assert} from "assert";
 import * as crypto from "crypto";
 import {createHash} from "../";
 
-const TITLE = __filename.split("/").pop();
+const TITLE = __filename.split("/").pop()!!;
 
 /**
  * Unicode's surrogate pair is a pair of 16bit characters in JavaScript.
