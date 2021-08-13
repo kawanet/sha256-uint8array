@@ -119,7 +119,7 @@ export class Hash {
     private _uint8(data: Uint8Array, offset?: number) {
         const {_byte, _word} = this;
         const length = data.length;
-        offset |= 0;
+        offset = offset!! | 0;
 
         while (offset < length) {
             const start = this._size % N.inputBytes;
@@ -190,7 +190,7 @@ export class Hash {
     private _int32(data: Int32Array, offset?: number): void {
         let {A, B, C, D, E, F, G, H} = this;
         let i = 0;
-        offset |= 0;
+        offset = offset!! | 0;
 
         while (i < N.inputWords) {
             W[i++] = swap32(data[offset++]);

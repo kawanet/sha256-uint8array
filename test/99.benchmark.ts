@@ -4,7 +4,7 @@ import {strict as assert} from "assert";
 import * as A from "./utils/adapters";
 import {MAKURANOSOSHI} from "./utils/sample-text";
 
-const TITLE = __filename.split("/").pop();
+const TITLE = __filename.split("/").pop()!!;
 
 const isBrowser = ("undefined" !== typeof window);
 const isLegacy = ("function" !== typeof TextEncoder);
@@ -48,7 +48,7 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
     });
 
     function testFor(adapter: A.Adapter) {
-        return function (this: Mocha.Context) {
+        return function (this: Mocha.Context): void {
             if (adapter.noString) return this.skip();
             this.timeout(10000);
 
@@ -60,7 +60,7 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
     }
 
     function testBinary(adapter: A.Adapter) {
-        return function (this: Mocha.Context) {
+        return function (this: Mocha.Context): void {
             if (adapter.noBinary) return this.skip();
             this.timeout(10000);
 
@@ -72,7 +72,7 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
     }
 
     function testAsync(adapter: A.AsyncAdapter) {
-        return async function (this: Mocha.Context) {
+        return async function (this: Mocha.Context): Promise<void> {
             if (adapter.noBinary) return this.skip();
             this.timeout(10000);
 
