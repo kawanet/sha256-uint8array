@@ -1,7 +1,6 @@
 {
   "include": [
-    "../lib",
-    "../test"
+    "./lib"
   ],
   "compilerOptions": {
     "module": "CommonJS",
@@ -11,13 +10,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": true,
-    "outDir": "../build",
+    "outDir": "build/es5/",
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "target": "ES5",
-    "types": [
-      "mocha",
-      "node"
-    ]
+    "target": "ES5"
   }
 }

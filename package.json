@@ -48,13 +48,11 @@
     "url": "git+https://github.com/kawanet/sha256-uint8array.git"
   },
   "scripts": {
-    "build": "./node_modules/.bin/tsc -p .",
-    "build-browser": "make -C browser clean all",
-    "build-test-es5": "make -C browser clean test-es5",
+    "build": "make clean all",
     "fixpack": "fixpack",
-    "mocha": "./node_modules/.bin/mocha -R spec test/*.js",
-    "prepack": "npm run build-browser && REPEAT=1 npm test",
-    "test": "npm run mocha"
+    "prepack": "npm run build && npm test",
+    "test": "REPEAT=1 make test",
+    "test-browser": "npm run build && open browser/test.html"
   },
   "typings": "./types/sha256-uint8array.d.ts"
 }

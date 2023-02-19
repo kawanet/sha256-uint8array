@@ -13,10 +13,6 @@
     "removeComments": false,
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "target": "ES2018",
-    "types": [
-      "mocha",
-      "node"
-    ]
+    "target": "ES2020"
   }
 }
