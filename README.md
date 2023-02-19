@@ -141,7 +141,7 @@ const hash = crypto.createHash("sha256").update("").digest("hex");
 
 ## MIT LICENSE
 
-Copyright (c) 2020-2021 Yusuke Kawasaki
+Copyright (c) 2020-2023 Yusuke Kawasaki
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
