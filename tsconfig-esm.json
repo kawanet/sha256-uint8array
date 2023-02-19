@@ -1,23 +1,19 @@
 {
   "include": [
-    "../lib",
-    "../test"
+    "./lib"
+
   ],
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "ESNext",
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "removeComments": true,
-    "outDir": "../build",
+    "outDir": "build/esm/",
+    "removeComments": false,
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "target": "ES5",
-    "types": [
-      "mocha",
-      "node"
-    ]
+    "target": "ES2020"
   }
 }

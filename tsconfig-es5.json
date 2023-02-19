@@ -1,7 +1,6 @@
 {
   "include": [
-    "./lib",
-    "./test"
+    "./lib"
   ],
   "compilerOptions": {
     "module": "CommonJS",
@@ -10,9 +9,10 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "removeComments": false,
+    "removeComments": true,
+    "outDir": "build/es5/",
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "target": "ES2020"
+    "target": "ES5"
   }
 }
