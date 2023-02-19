@@ -4,13 +4,12 @@
 [![npm version](https://img.shields.io/npm/v/sha256-uint8array)](https://www.npmjs.com/package/sha256-uint8array)
 [![minified size](https://img.shields.io/bundlephobia/min/sha256-uint8array)](https://cdn.jsdelivr.net/npm/sha256-uint8array/dist/sha256-uint8array.min.js)
 
-
 Fast SHA-256 digest hash based on Uint8Array, pure JavaScript.
 
 ## SYNOPSIS
 
 ```js
-const createHash = require("sha256-uint8array").createHash;
+const {createHash} = require("sha256-uint8array");
 
 const text = "";
 const hex = createHash().update(text).digest("hex");
@@ -24,6 +23,12 @@ const hash = createHash().update(data).digest();
 See TypeScript declaration
 [sha256-uint8array.d.ts](https://github.com/kawanet/sha256-uint8array/blob/main/types/sha256-uint8array.d.ts)
 for detail.
+
+## ES MODULE
+
+```js
+import {createHash} from "sha256-uint8array";
+```
 
 ## COMPATIBILITY
 

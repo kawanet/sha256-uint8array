@@ -29,7 +29,8 @@
     "LICENSE",
     "README.md",
     "browser/import.js",
-    "dist/*.js",
+    "dist/*.min.js",
+    "dist/*.mjs",
     "lib/*.js",
     "types/sha256-uint8array.d.ts"
   ],
@@ -43,6 +44,7 @@
   ],
   "license": "MIT",
   "main": "./lib/sha256-uint8array.js",
+  "module": "./dist/sha256-uint8array.mjs",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kawanet/sha256-uint8array.git"
@@ -52,7 +54,8 @@
     "fixpack": "fixpack",
     "prepack": "npm run build && npm test",
     "test": "REPEAT=1 make test",
-    "test-browser": "npm run build && open browser/test.html"
+    "test-browser": "make build/test.js && open browser/test.html"
   },
+  "type": "commonjs",
   "typings": "./types/sha256-uint8array.d.ts"
 }

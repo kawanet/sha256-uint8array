@@ -3,7 +3,7 @@
 ALL=\
 	lib/sha256-uint8array.js \
 	dist/sha256-uint8array.min.js \
-	build/test.js \
+	dist/sha256-uint8array.mjs
 
 all: $(ALL)
 
@@ -20,6 +20,12 @@ build/bundle.js: build/es5/sha256-uint8array.js
 
 build/es5/%.js: lib/%.ts
 	node_modules/.bin/tsc -p tsconfig-es5.json
+
+build/esm/%.js:
+	node_modules/.bin/tsc -p tsconfig-esm.json
+
+dist/%.mjs: build/esm/%.js
+	cp $^ $@
 
 build/test.js: all
 	node_modules/.bin/browserify --list test/*.js \
@@ -45,6 +51,7 @@ sizes:
 
 test: all
 	node_modules/.bin/mocha test/*.js
+	node -e 'import("./dist/sha256-uint8array.mjs").then(x => console.log(x.createHash().digest("hex")))'
 	node -e 'console.log(require("./dist/sha256-uint8array.min.js").createHash().digest("hex"))'
 
 .PHONY: all clean test
