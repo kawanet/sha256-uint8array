@@ -1,7 +1,7 @@
 {
   "name": "sha256-uint8array",
   "description": "Fast SHA-256 digest hash based on Uint8Array, pure JavaScript.",
-  "version": "0.10.5",
+  "version": "0.10.6",
   "author": "Yusuke Kawasaki <u-suke@kawa.net>",
   "bugs": {
     "url": "https://github.com/kawanet/sha256-uint8array/issues"
@@ -19,15 +19,20 @@
     "crypto-js": "^4.1.1",
     "hash.js": "^1.1.7",
     "jshashes": "^1.0.8",
-    "jssha": "^3.3.0",
+    "jssha": "^3.3.1",
     "mocha": "^10.2.0",
     "sha.js": "^2.4.11",
-    "terser": "^5.16.4",
-    "typescript": "^4.9.5"
+    "terser": "^5.19.2",
+    "typescript": "^5.1.6"
   },
   "exports": {
-    "require": "./lib/sha256-uint8array.js",
-    "import": "./dist/sha256-uint8array.mjs"
+    ".": {
+      "require": "./lib/sha256-uint8array.js",
+      "import": {
+        "default": "./dist/sha256-uint8array.mjs",
+        "types": "./types/sha256-uint8array.d.ts"
+      }
+    }
   },
   "files": [
     "LICENSE",
