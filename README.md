@@ -9,7 +9,7 @@ Fast SHA-256 digest hash based on Uint8Array, pure JavaScript.
 ## SYNOPSIS
 
 ```js
-const {createHash} = require("sha256-uint8array");
+import {createHash} from "sha256-uint8array";
 
 const text = "";
 const hex = createHash().update(text).digest("hex");
@@ -24,10 +24,12 @@ See TypeScript declaration
 [sha256-uint8array.d.ts](https://github.com/kawanet/sha256-uint8array/blob/main/types/sha256-uint8array.d.ts)
 for detail.
 
-## ES MODULE
+## CJS
+
+Both ES Modules and CommonJS supported.
 
 ```js
-import {createHash} from "sha256-uint8array";
+const {createHash} = require("sha256-uint8array");
 ```
 
 ## COMPATIBILITY
@@ -85,13 +87,12 @@ make -C browser
 open browser/test.html
 ```
 
-## BROWSER
+## WEB BROWSERS
 
-The minified version of the library is also available for browsers via
-[jsDelivr](https://www.jsdelivr.com/package/npm/sha256-uint8array) CDN.
-
+- The minified build of the library is also available for Web browsers via
+[jsDelivr CDN](https://www.jsdelivr.com/package/npm/sha256-uint8array).
+- https://cdn.jsdelivr.net/npm/sha256-uint8array/dist/sha256-uint8array.min.js
 - Live Demo https://kawanet.github.io/sha256-uint8array/
-- Minified https://cdn.jsdelivr.net/npm/sha256-uint8array/dist/sha256-uint8array.min.js
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/sha256-uint8array/dist/sha256-uint8array.min.js"></script>
