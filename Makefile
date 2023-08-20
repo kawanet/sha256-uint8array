@@ -7,6 +7,7 @@ ALL=\
 
 all: $(ALL)
 
+# ES5 - CommonJS for browsers
 dist/sha256-uint8array.min.js: build/bundle.js
 	@mkdir -p dist
 	node_modules/.bin/terser -c -m --mangle-props "regex=/^_/" --ecma 5 -o $@ $<
@@ -18,12 +19,15 @@ build/bundle.js: build/es5/sha256-uint8array.js
 	echo '})(SHA256)' >> $@
 	perl -i -pe 's#^("use strict"|Object.defineProperty|exports.*= void 0)#// $$&#' $@
 
+# ES5 - CommonJS
 build/es5/%.js: lib/%.ts
 	node_modules/.bin/tsc -p tsconfig-es5.json
 
+# ES2021 - ES Module
 build/esm/%.js:
 	node_modules/.bin/tsc -p tsconfig-esm.json
 
+# ES2021 - ES Module
 dist/%.mjs: build/esm/%.js
 	cp $^ $@
 
@@ -33,11 +37,12 @@ build/test.js: all
 	node_modules/.bin/browserify -o $@ test/*.js \
 		-t [ browserify-sed 's#(require\("(?:../)+)("\))#$$1browser/import$$2#' ]
 
+# ES2021 - CommonJS
 lib/%.js: lib/%.ts
 	node_modules/.bin/tsc -p tsconfig.json
 
 clean:
-	/bin/rm -fr build dist/*.js lib/*.js test/*.js
+	/bin/rm -fr $(ALL) build/ lib/*.js test/*.js
 
 sizes:
 	wc -c dist/sha256-uint8array.min.js
