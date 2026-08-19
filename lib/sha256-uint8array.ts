@@ -2,6 +2,12 @@
  * sha256-uint8array.ts
  */
 
+// Self-reference via the package name so `tsc --noEmit` resolves these
+// types through `package.json` `exports` — the same path an external
+// consumer would take. If the `exports.types` mapping ever breaks,
+// the build fails here.
+import type * as types from "sha256-uint8array"
+
 // first 32 bits of the fractional parts of the cube roots of the first 64 primes 2..311
 const K = [
     0x428a2f98 | 0, 0x71374491 | 0, 0xb5c0fbcf | 0, 0xe9b5dba5 | 0,
@@ -37,13 +43,13 @@ const algorithms: { [algorithm: string]: number } = {
     sha256: 1,
 };
 
-export function createHash(algorithm?: string) {
+export const createHash: typeof types.createHash = (algorithm?: string) => {
     if (algorithm && !algorithms[algorithm] && !algorithms[algorithm.toLowerCase()]) {
         throw new Error("Digest method not supported");
     }
 
     return new Hash();
-}
+};
 
 export class Hash {
     // first 32 bits of the fractional parts of the square roots of the first 8 primes 2..19
