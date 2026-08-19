@@ -20,7 +20,15 @@ const rollupConfig: RollupOptions = {
      * test/utils/adapters.ts
      */
     external: [
+        // "@aws-crypto/sha256-js"
+        // "@noble/hashes/sha2.js"
+        // "create-hash/browser.js"
+        // "crypto-js"
+        // "fast-sha256"
+        // "hash.js/lib/hash/sha/256.js"
+        "js-sha256",
         "jssha/dist/sha256",
+        // "node-forge/lib/sha256.js"
         "sha.js/sha256.js",
     ],
 
@@ -28,7 +36,15 @@ const rollupConfig: RollupOptions = {
         file: "../browser/tests/bundled.js",
         format: "iife",
         globals: {
+            // "@aws-crypto/sha256-js": "aws_crypto_sha256",
+            // "@noble/hashes/sha2.js": "@noble_hashes_sha2",
+            // "create-hash/browser.js": "create_hash_browser",
+            // "crypto-js": "crypto_js",
+            // "fast-sha256": "fast_sha256",
+            // "hash.js/lib/hash/sha/256.js": "hash_js_lib_hash_sha_256",
+            "js-sha256": "js_sha256",
             "jssha/dist/sha256": "jssha_dist_sha256",
+            // "node-forge/lib/sha256.js": "node_forge_lib_sha256",
             "sha.js/sha256.js": "sha_js_sha256",
         }
     },
