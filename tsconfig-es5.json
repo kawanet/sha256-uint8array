@@ -2,15 +2,22 @@
   "include": [
     "./lib"
   ],
+  "exclude": [
+    "node_modules/"
+  ],
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "ignoreDeprecations": "6.0",
     "module": "CommonJS",
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "removeComments": true,
     "outDir": "build/es5/",
+    "removeComments": true,
+    "rootDir": "./lib",
     "skipLibCheck": true,
     "strictNullChecks": true,
     "target": "ES5"
