@@ -48,7 +48,7 @@ const rollupConfig: RollupOptions = {
             "jssha/dist/sha256": "jssha_dist_sha256",
             "node-forge/lib/sha256.js": "node_forge_lib_sha256",
             "sha.js/sha256.js": "sha_js_sha256",
-        }
+        },
     },
 
     treeshake: false,
