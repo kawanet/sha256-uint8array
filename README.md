@@ -77,14 +77,12 @@ You could run the benchmark as below.
 git clone https://github.com/kawanet/sha256-uint8array.git
 cd sha256-uint8array
 npm install
+npm run build
 
-# run the tests, with the benchmark kept short
-npm test
+# run the benchmark on Node.js
+REPEAT=10000 node --test test/99.benchmark.test.ts
 
-# run the benchmark with enough repetitions to compare
-REPEAT=10000 npm test
-
-# run the tests and the benchmark on a browser
+# run tests and the benchmark on browser
 npm run test-browser
 ```
 
