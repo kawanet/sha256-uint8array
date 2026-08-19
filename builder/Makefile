@@ -34,10 +34,10 @@ CJS_MAX_BYTES   := 16000
 # the README advertises.
 MINJS_MAX_BYTES := 6000
 
-# The browser test bundle inlines the suites, the shims and every
-# implementation the benchmark compares against, so it is large by design.
-# The cap only guards against a step change.
-TEST_MAX_BYTES := 800000
+# The browser test bundle carries the suites and the shims; every compared
+# implementation now loads separately from browser/vendor. The cap only
+# guards against a step change, such as a dependency slipping back in.
+TEST_MAX_BYTES := 60000
 
 ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST) $(TEST_DST)
 
