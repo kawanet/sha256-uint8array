@@ -21,3 +21,9 @@ exports.it = function (name, fn) {
         return fn(ctx);
     });
 };
+
+// Suites also declare permanently skipped cases. Without this the call throws
+// while mocha is still building the suite, which drops every declaration after
+// it without failing anything. mocha never runs a skipped body, so the context
+// wrapper above is not needed here.
+exports.it.skip = it.skip;
