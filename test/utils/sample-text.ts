@@ -13,7 +13,7 @@ export const MAKURANOSOSHI = `
 冬は雪の降りたるはいふべきにもあらず。
 霜などのいと白く、又さらでもいと寒き、火などいそぎおこして炭もてわたるもいとつきづきし。
 ひるになりてぬるくゆるびもてゆけば、すびつ火桶の火も白き灰がちになりぬるはわろし。
-`; // 894 bytes
+` // 894 bytes
 
 /**
  * A package.json-shaped ASCII blob of roughly one kilobyte, used as the
