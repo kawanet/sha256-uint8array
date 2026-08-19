@@ -53,7 +53,7 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
         it("fast-sha256", testBinary(new A.FastSha256()))
         it("js-sha256", testBinary(new A.JsSha256()))
         it("@aws-crypto/sha256-js", testBinary(new A.AwsCrypto()))
-        it.skip("crypto.subtle.digest()", testAsync(new A.SubtleCrypto()))
+        it("crypto.subtle.digest()", testAsync(new A.SubtleCrypto()))
     })
 
     function testFor(adapter: A.Adapter) {
