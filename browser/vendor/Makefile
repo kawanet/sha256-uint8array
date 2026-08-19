@@ -1,6 +1,7 @@
 ALL := \
 	aws_crypto_sha256.js \
 	crypto_js.js \
+	fast_sha256.js \
 	js_sha256.js \
 	jssha_dist_sha256.js \
 	noble_hashes_sha2.js \
@@ -19,6 +20,13 @@ aws_crypto_sha256.js: ../../node_modules/@aws-crypto/sha256-js/build/index.js
 
 crypto_js.js: ../../node_modules/crypto-js/index.js
 	../../node_modules/.bin/rollup --name crypto_js \
+	-p 'node-resolve={browser:true,preferBuiltins:false}' \
+	-p 'commonjs' \
+	--format iife $< -o $@
+	@ls -l $@
+
+fast_sha256.js: ../../node_modules/fast-sha256/sha256.js
+	../../node_modules/.bin/rollup --name fast_sha256 \
 	-p 'node-resolve={browser:true,preferBuiltins:false}' \
 	-p 'commonjs' \
 	--format iife $< -o $@
