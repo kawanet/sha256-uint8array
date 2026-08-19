@@ -3,13 +3,13 @@
  */
 
 export function stringToArrayBuffer(str: string): ArrayBuffer {
-    str = unescape(encodeURIComponent(str));
-    const buffer = new ArrayBuffer(str.length);
-    const data = new Uint8Array(buffer);
+    str = unescape(encodeURIComponent(str))
+    const buffer = new ArrayBuffer(str.length)
+    const data = new Uint8Array(buffer)
     for (let i = 0; i < str.length; i++) {
-        data[i] = str.charCodeAt(i);
+        data[i] = str.charCodeAt(i)
     }
-    return buffer;
+    return buffer
 }
 
 /**
@@ -17,10 +17,10 @@ export function stringToArrayBuffer(str: string): ArrayBuffer {
  */
 
 export function arrayToArrayBuffer(array: number[]): ArrayBuffer {
-    const buffer = new ArrayBuffer(array.length);
-    const data = new Uint8Array(buffer);
-    array.forEach((num, idx) => data[idx] = num);
-    return buffer;
+    const buffer = new ArrayBuffer(array.length)
+    const data = new Uint8Array(buffer)
+    array.forEach((num, idx) => data[idx] = num)
+    return buffer
 }
 
 /**
@@ -28,10 +28,10 @@ export function arrayToArrayBuffer(array: number[]): ArrayBuffer {
  */
 
 export function arrayToHex(data: Uint8Array): string {
-    const length = data.length;
-    let hex = "";
+    const length = data.length
+    let hex = ""
     for (let i = 0; i < length; i++) {
-        hex += (data[i] | 0x100).toString(16).substr(-2);
+        hex += (data[i] | 0x100).toString(16).substr(-2)
     }
-    return hex;
+    return hex
 }

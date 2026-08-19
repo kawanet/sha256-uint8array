@@ -140,6 +140,7 @@ test:
 # here so `npm test` stays quick; `REPEAT=10000 npm test` still measures.
 test-full: all smoke
 	cd .. && node_modules/.bin/tsc --noEmit
+	cd .. && node_modules/.bin/ts-refine format --check && node_modules/.bin/ts-refine imports --check
 	cd .. && REPEAT=$${REPEAT:-1} node --test test/*.test.ts
 
 ####

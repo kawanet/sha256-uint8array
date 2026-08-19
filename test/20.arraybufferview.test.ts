@@ -1,69 +1,69 @@
 import {describe, it} from "node:test"
 
-import {strict as assert} from "node:assert";
-import {createHash} from "sha256-uint8array";
-import {stringToArrayBuffer} from "./utils/utils.ts";
+import {strict as assert} from "node:assert"
+import {createHash} from "sha256-uint8array"
+import {stringToArrayBuffer} from "./utils/utils.ts"
 
 // Suite label. Kept a literal so the CommonJS build for the browser
 // bundle does not need import.meta.
-const TITLE = "20.arraybufferview.test.ts";
+const TITLE = "20.arraybufferview.test.ts"
 
 describe(TITLE, () => {
-    const buffer = stringToArrayBuffer("ABCDEFGH");
-    const expected = "9ac2197d9258257b1ae8463e4214e4cd0a578bc1517f2415928b91be4283fc48";
+    const buffer = stringToArrayBuffer("ABCDEFGH")
+    const expected = "9ac2197d9258257b1ae8463e4214e4cd0a578bc1517f2415928b91be4283fc48"
 
     it("Int8Array", () => {
-        const data = new Int8Array(buffer);
-        assert.equal(data.BYTES_PER_ELEMENT, 1);
-        assert.equal(data.byteLength, 8);
-        assert.equal(data.byteOffset, 0);
-        assert.equal(createHash().update(data).digest("hex"), expected);
-    });
+        const data = new Int8Array(buffer)
+        assert.equal(data.BYTES_PER_ELEMENT, 1)
+        assert.equal(data.byteLength, 8)
+        assert.equal(data.byteOffset, 0)
+        assert.equal(createHash().update(data).digest("hex"), expected)
+    })
 
     it("Uint16Array", () => {
-        const data = new Uint16Array(buffer);
-        assert.equal(data.BYTES_PER_ELEMENT, 2);
-        assert.equal(data.byteLength, 8);
-        assert.equal(data.byteOffset, 0);
-        assert.equal(createHash().update(data).digest("hex"), expected);
-    });
+        const data = new Uint16Array(buffer)
+        assert.equal(data.BYTES_PER_ELEMENT, 2)
+        assert.equal(data.byteLength, 8)
+        assert.equal(data.byteOffset, 0)
+        assert.equal(createHash().update(data).digest("hex"), expected)
+    })
 
-    it("Uint16Array offset 0", testFor(0));
-    it("Uint16Array offset 2", testFor(2));
-    it("Uint16Array offset 4", testFor(4));
+    it("Uint16Array offset 0", testFor(0))
+    it("Uint16Array offset 2", testFor(2))
+    it("Uint16Array offset 4", testFor(4))
 
     it("Uint32Array", () => {
-        const data = new Uint32Array(buffer);
-        assert.equal(data.BYTES_PER_ELEMENT, 4);
-        assert.equal(data.byteLength, 8);
-        assert.equal(data.byteOffset, 0);
-        assert.equal(createHash().update(data).digest("hex"), expected);
-    });
+        const data = new Uint32Array(buffer)
+        assert.equal(data.BYTES_PER_ELEMENT, 4)
+        assert.equal(data.byteLength, 8)
+        assert.equal(data.byteOffset, 0)
+        assert.equal(createHash().update(data).digest("hex"), expected)
+    })
 
     it("DataView", () => {
-        const data = new DataView(buffer);
-        assert.equal(data.byteLength, 8);
-        assert.equal(data.byteOffset, 0);
-        assert.equal(data.getInt8(0), 0x41);
-        assert.equal(createHash().update(data).digest("hex"), expected);
-    });
+        const data = new DataView(buffer)
+        assert.equal(data.byteLength, 8)
+        assert.equal(data.byteOffset, 0)
+        assert.equal(data.getInt8(0), 0x41)
+        assert.equal(createHash().update(data).digest("hex"), expected)
+    })
 
     it("null", () => {
-        assert.throws(() => createHash().update(null as any));
-        assert.doesNotThrow(() => createHash().update(""));
-    });
+        assert.throws(() => createHash().update(null as any))
+        assert.doesNotThrow(() => createHash().update(""))
+    })
 
     function testFor(offset: number) {
         return (): void => {
-            const word = new Uint8Array(buffer, offset, 4).slice();
-            const expected = createHash().update(word).digest("hex");
+            const word = new Uint8Array(buffer, offset, 4).slice()
+            const expected = createHash().update(word).digest("hex")
 
             // one word array with offset
-            const data = new Uint16Array(buffer, offset, 2);
-            assert.equal(data.BYTES_PER_ELEMENT, 2);
-            assert.equal(data.byteLength, 4);
-            assert.equal(data.byteOffset, offset);
-            assert.equal(createHash().update(data).digest("hex"), expected);
+            const data = new Uint16Array(buffer, offset, 2)
+            assert.equal(data.BYTES_PER_ELEMENT, 2)
+            assert.equal(data.byteLength, 4)
+            assert.equal(data.byteOffset, offset)
+            assert.equal(createHash().update(data).digest("hex"), expected)
         }
     }
-});
+})

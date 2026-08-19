@@ -1,12 +1,12 @@
 import {describe, it} from "node:test"
 
-import {strict as assert} from "node:assert";
-import * as crypto from "node:crypto";
-import {createHash} from "sha256-uint8array";
+import {strict as assert} from "node:assert"
+import * as crypto from "node:crypto"
+import {createHash} from "sha256-uint8array"
 
 // Suite label. Kept a literal so the CommonJS build for the browser
 // bundle does not need import.meta.
-const TITLE = "11.surrogate.test.ts";
+const TITLE = "11.surrogate.test.ts"
 
 /**
  * Unicode's surrogate pair is a pair of 16bit characters in JavaScript.
@@ -54,27 +54,27 @@ describe(TITLE, () => {
         "\u{1F633}", // 😳 FLUSHED FACE
         "\u{1F635}", // 😵 DIZZY FACE
         "\u{1F637}", // 😷 FACE WITH MEDICAL MASK
-    ];
+    ]
 
-    it("offset 1", testFor(1));
-    it("offset 2", testFor(2));
-    it("offset 3", testFor(3));
-    it("offset 4", testFor(4));
-    it("offset 5", testFor(5));
-    it("offset 6", testFor(6));
-    it("offset 7", testFor(7));
+    it("offset 1", testFor(1))
+    it("offset 2", testFor(2))
+    it("offset 3", testFor(3))
+    it("offset 4", testFor(4))
+    it("offset 5", testFor(5))
+    it("offset 6", testFor(6))
+    it("offset 7", testFor(7))
 
     function testFor(offset: number) {
         return () => {
-            const input = "123456789".substr(-offset) + emojis.join("");
-            assert.equal(input.length, emojis.length * 2 + offset);
+            const input = "123456789".substr(-offset) + emojis.join("")
+            assert.equal(input.length, emojis.length * 2 + offset)
 
-            const expected = crypto.createHash("sha256").update(input).digest("hex");
-            assert.equal(createHash().update(input).digest("hex"), expected, "update only once");
+            const expected = crypto.createHash("sha256").update(input).digest("hex")
+            assert.equal(createHash().update(input).digest("hex"), expected, "update only once")
 
-            const hash = createHash();
-            input.split("").forEach(c => hash.update(c));
-            assert.equal(hash.digest("hex"), expected, "update for each character");
-        };
+            const hash = createHash()
+            input.split("").forEach(c => hash.update(c))
+            assert.equal(hash.digest("hex"), expected, "update for each character")
+        }
     }
-});
+})
