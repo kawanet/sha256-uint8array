@@ -1,9 +1,13 @@
 {
   "include": [
     "./lib"
-
+  ],
+  "exclude": [
+    "node_modules/"
   ],
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "module": "ESNext",
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -12,8 +16,9 @@
     "noUnusedParameters": true,
     "outDir": "build/esm/",
     "removeComments": false,
+    "rootDir": "./lib",
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "target": "ES2021"
+    "target": "ES2022"
   }
 }
