@@ -37,7 +37,7 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
         it("node-forge", testFor(new A.NodeForge()))
         it("fast-sha256", testFor(new A.FastSha256()))
         it("js-sha256", testFor(new A.JsSha256()))
-        it.skip("@aws-crypto/sha256-js", testFor(new A.AwsCrypto()))
+        it("@aws-crypto/sha256-js", testFor(new A.AwsCrypto()))
     })
 
     describe("input: Uint8Array => output: hex", () => {
@@ -52,7 +52,7 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
         it("node-forge", testBinary(new A.NodeForge()))
         it("fast-sha256", testBinary(new A.FastSha256()))
         it("js-sha256", testBinary(new A.JsSha256()))
-        it.skip("@aws-crypto/sha256-js", testBinary(new A.AwsCrypto()))
+        it("@aws-crypto/sha256-js", testBinary(new A.AwsCrypto()))
         it.skip("crypto.subtle.digest()", testAsync(new A.SubtleCrypto()))
     })
 
