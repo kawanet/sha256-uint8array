@@ -1,19 +1,26 @@
 name: Node.js CI
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [ 16, 18, 20 ]
+        node-version: [ "22", "24", "26" ]
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm install
-    - run: npm run build --if-present
-    - run: npm test
+      - uses: actions/checkout@v7
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - run: npm install
+
+      # 'npm install' does not build here: there is no 'prepare' script and the
+      # Makefile drives tsc, so keep this separate to tell a build failure apart
+      # from a test failure in the CI log.
+      - run: npm run build --if-present
+
+      - run: npm test
