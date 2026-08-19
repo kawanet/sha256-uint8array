@@ -6,6 +6,7 @@ ALL := \
 	js_sha256.js \
 	jssha_dist_sha256.js \
 	noble_hashes_sha2.js \
+	noble_hashes_utils.js \
 	node_forge_lib_sha256.js \
 	sha_js_sha256.js \
 
@@ -57,6 +58,13 @@ jssha_dist_sha256.js: ../../node_modules/jssha/dist/sha256.js
 
 noble_hashes_sha2.js: ../../node_modules/@noble/hashes/sha2.js
 	../../node_modules/.bin/rollup --name noble_hashes_sha2 \
+	-p 'node-resolve={browser:true,preferBuiltins:false}' \
+	-p 'commonjs' \
+	--format iife $< -o $@
+	@ls -l $@
+
+noble_hashes_utils.js: ../../node_modules/@noble/hashes/utils.js
+	../../node_modules/.bin/rollup --name noble_hashes_utils \
 	-p 'node-resolve={browser:true,preferBuiltins:false}' \
 	-p 'commonjs' \
 	--format iife $< -o $@
