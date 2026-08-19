@@ -39,10 +39,12 @@ export class SHA256Uint8Array implements Adapter {
     private createHash = ownCreateHash;
 
     hash(data: string | Uint8Array | ArrayBufferView): string {
-        // update() is overloaded per input kind rather than accepting the
-        // union, so branch to let one overload be selected.
         const hash = this.createHash();
-        "string" === typeof data ? hash.update(data) : hash.update(data);
+        if ("string" === typeof data) {
+            hash.update(data); // same call either way: update() is overloaded, not union-typed
+        } else {
+            hash.update(data);
+        }
         return hash.digest("hex");
     }
 }
