@@ -2,9 +2,9 @@
  * An interface which has digest() method
  */
 
-import {arrayToHex} from "./utils.ts";
 import {Sha256 as awsSha256} from "@aws-crypto/sha256-js";
 import {sha256 as noble} from "@noble/hashes/sha2.js";
+import {bytesToHex} from "@noble/hashes/utils.js";
 import createHashBrowser from "create-hash/browser.js";
 import cryptoJs from "crypto-js";
 import fastSha256 from "fast-sha256";
@@ -15,6 +15,7 @@ import forgeSha from "node-forge/lib/sha256.js";
 import * as nodeCrypto from "node:crypto";
 import shaJs from "sha.js/sha256.js";
 import {createHash as ownCreateHash} from "sha256-uint8array";
+import {arrayToHex} from "./utils.ts";
 
 export interface Adapter {
     noString?: boolean;
@@ -167,12 +168,12 @@ export class AwsCrypto implements Adapter {
  */
 
 export class Noble implements Adapter {
-    private hash_ = noble;
+    private sha256 = noble;
     noString = true;
     noDataView = true;
 
     hash(data: Uint8Array): string {
-        return arrayToHex(this.hash_(data));
+        return bytesToHex(this.sha256(data));
     }
 }
 
@@ -200,12 +201,12 @@ export class NodeForge implements Adapter {
  */
 
 export class FastSha256 implements Adapter {
-    private hash_ = fastSha256;
+    private sha256 = fastSha256;
     noString = true;
     noDataView = true;
 
     hash(data: Uint8Array): string {
-        return arrayToHex(this.hash_(data));
+        return arrayToHex(this.sha256(data));
     }
 }
 
@@ -214,11 +215,11 @@ export class FastSha256 implements Adapter {
  */
 
 export class JsSha256 implements Adapter {
-    private hash_ = jsSha256;
+    private sha256 = jsSha256;
     noDataView = true;
 
     hash(data: string | Uint8Array): string {
-        return this.hash_(data);
+        return this.sha256(data);
     }
 }
 
