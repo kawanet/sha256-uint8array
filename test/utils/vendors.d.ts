@@ -8,6 +8,6 @@
 declare module "create-hash/browser.js";
 declare module "crypto-js";
 declare module "hash.js/lib/hash/sha/256.js";
-declare module "jshashes";
 declare module "jssha/dist/sha256";
+declare module "node-forge/lib/sha256.js";
 declare module "sha.js/sha256.js";

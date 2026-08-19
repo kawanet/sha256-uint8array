@@ -33,7 +33,10 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
         it("jssha", testFor(new A.JsSHA()));
         it("hash.js", testFor(new A.HashJs()));
         it("sha.js", testFor(new A.ShaJS()));
-        it("jshashes", testFor(new A.JsHashes()));
+        it("@noble/hashes", testFor(new A.Noble()));
+        it("node-forge", testFor(new A.NodeForge()));
+        it("fast-sha256", testFor(new A.FastSha256()));
+        it("js-sha256", testFor(new A.JsSha256()));
         it.skip("@aws-crypto/sha256-js", testFor(new A.AwsCrypto()));
     });
 
@@ -45,7 +48,10 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
         it("jssha", testBinary(new A.JsSHA()));
         it("hash.js", testBinary(new A.HashJs()));
         it("sha.js", testBinary(new A.ShaJS()));
-        it("jshashes", testBinary(new A.JsHashes()));
+        it("@noble/hashes", testBinary(new A.Noble()));
+        it("node-forge", testBinary(new A.NodeForge()));
+        it("fast-sha256", testBinary(new A.FastSha256()));
+        it("js-sha256", testBinary(new A.JsSha256()));
         it.skip("@aws-crypto/sha256-js", testBinary(new A.AwsCrypto()));
         it.skip("crypto.subtle.digest()", testAsync(new A.SubtleCrypto()));
     });

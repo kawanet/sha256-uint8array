@@ -3,11 +3,15 @@
  */
 
 import {Sha256 as awsSha256} from "@aws-crypto/sha256-js";
+import {sha256 as noble} from "@noble/hashes/sha2.js";
+import {bytesToHex} from "@noble/hashes/utils.js";
 import createHashBrowser from "create-hash/browser.js";
 import cryptoJs from "crypto-js";
+import fastSha256 from "fast-sha256";
 import hashJs from "hash.js/lib/hash/sha/256.js";
-import jsHashes from "jshashes";
+import {sha256 as jsSha256} from "js-sha256";
 import jsSha from "jssha/dist/sha256";
+import forgeSha from "node-forge/lib/sha256.js";
 import * as nodeCrypto from "node:crypto";
 import shaJs from "sha.js/sha256.js";
 import {createHash as ownCreateHash} from "sha256-uint8array";
@@ -99,19 +103,6 @@ export class CryptoJs implements Adapter {
 }
 
 /**
- * https://www.npmjs.com/package/jshashes
- */
-
-export class JsHashes implements Adapter {
-    private Hashes = jsHashes;
-    noBinary = true;
-
-    hash(data: string): string {
-        return new this.Hashes.SHA256().hex(data);
-    }
-}
-
-/**
  * https://www.npmjs.com/package/jssha
  */
 
@@ -167,6 +158,68 @@ export class AwsCrypto implements Adapter {
         const hash = new this.Sha256();
         hash.update(data);
         return arrayToHex(hash.digestSync());
+    }
+}
+
+/**
+ * https://www.npmjs.com/package/@noble/hashes
+ *
+ * Note: it rejects a string outright rather than guessing an encoding.
+ */
+
+export class Noble implements Adapter {
+    private sha256 = noble;
+    noString = true;
+    noDataView = true;
+
+    hash(data: Uint8Array): string {
+        return bytesToHex(this.sha256(data));
+    }
+}
+
+/**
+ * https://www.npmjs.com/package/node-forge
+ *
+ * Note: the SHA-256 module is imported on its own; the package root
+ * pulls in the whole crypto suite.
+ */
+
+export class NodeForge implements Adapter {
+    private md = forgeSha;
+    noBinary = true;
+
+    hash(data: string): string {
+        const md = this.md.create();
+        // update() reads a string as latin1 unless the encoding is named.
+        md.update(data, "utf8");
+        return md.digest().toHex();
+    }
+}
+
+/**
+ * https://www.npmjs.com/package/fast-sha256
+ */
+
+export class FastSha256 implements Adapter {
+    private sha256 = fastSha256;
+    noString = true;
+    noDataView = true;
+
+    hash(data: Uint8Array): string {
+        return arrayToHex(this.sha256(data));
+    }
+}
+
+/**
+ * https://www.npmjs.com/package/js-sha256
+ */
+
+export class JsSha256 implements Adapter {
+    private sha256 = jsSha256;
+    noDataView = true;
+
+    hash(data: string | Uint8Array): string {
+        return this.sha256(data);
     }
 }
 
