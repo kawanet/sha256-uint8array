@@ -23,7 +23,6 @@ const rollupConfig: RollupOptions = {
         "@aws-crypto/sha256-js",
         "@noble/hashes/sha2.js",
         "@noble/hashes/utils.js",
-        // "create-hash/browser.js"
         "crypto-js",
         "fast-sha256",
         "hash.js/lib/hash/sha/256.js",
@@ -40,7 +39,6 @@ const rollupConfig: RollupOptions = {
             "@aws-crypto/sha256-js": "aws_crypto_sha256",
             "@noble/hashes/sha2.js": "noble_hashes_sha2",
             "@noble/hashes/utils.js": "noble_hashes_utils",
-            // "create-hash/browser.js": "create_hash_browser",
             "crypto-js": "crypto_js",
             "fast-sha256": "fast_sha256",
             "hash.js/lib/hash/sha/256.js": "hash_js_lib_hash_sha_256",
@@ -63,7 +61,6 @@ const rollupConfig: RollupOptions = {
                 {find: "node:test", replacement: here("./node-test.shim.ts")},
                 {find: "node:assert", replacement: here("./node-assert.shim.ts")},
                 {find: "node:crypto", replacement: here("./node-crypto.shim.ts")},
-                {find: "create-hash/browser.js", replacement: here("./create-hash.shim.ts")},
                 {find: "sha256-uint8array", replacement: here("../browser/import.js")},
             ],
         }),

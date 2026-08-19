@@ -30,8 +30,6 @@ describe(TITLE, () => {
 
     it("js-sha256", testFor(new A.JsSha256()))
 
-    it("create-hash/browser", testFor(new A.CreateHash()))
-
     it("@aws-crypto/sha256-js", testFor(new A.AwsCrypto()))
 })
 

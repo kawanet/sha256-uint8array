@@ -48,7 +48,6 @@ It has a better compatibility with Node.js's `crypto` module in its smaller foot
 |[node-forge](https://www.npmjs.com/package/node-forge)|✅ OK|🚫 NO|🚫 NO|✅ OK|🚫 NO|TBD|
 |[fast-sha256](https://www.npmjs.com/package/fast-sha256)|🚫 NO|✅ OK|🚫 NO|🚫 NO|✅ OK|TBD|
 |[js-sha256](https://www.npmjs.com/package/js-sha256)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|TBD|
-|[create-hash](https://npmjs.com/package/create-hash)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|95KB|
 |[@aws-crypto/sha256-js](https://www.npmjs.com/package/@aws-crypto/sha256-js)|✅ OK|✅ OK|🚫 NO|🚫 NO|✅ OK|14KB|
 |[crypto.subtle.digest()](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)|🚫 NO|✅ OK|✅ OK|🚫 NO|🚫 NO|-|
 
