@@ -14,9 +14,21 @@ const here = (path: string): string => fileURLToPath(new URL(path, import.meta.u
 const rollupConfig: RollupOptions = {
     input: "../test/*.test.ts",
 
+    /**
+     * browser/tests.html
+     * browser/vendor/Makefile
+     * test/utils/adapters.ts
+     */
+    external: [
+        "sha.js/sha256.js",
+    ],
+
     output: {
         file: "../browser/tests/bundled.js",
         format: "iife",
+        globals: {
+            "sha.js/sha256.js": "sha_js_sha256",
+        }
     },
 
     treeshake: false,

@@ -95,6 +95,7 @@ $(PKG_DST):
 # package resolves to the global that dist/*.min.js leaves behind.
 $(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(BROWSER_SRC) $(MINJS_DST)
 	@mkdir -p $(dir $@)
+	$(MAKE) -C ../browser/vendor
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@
 	@test "$$(wc -c < $@)" -le $(TEST_MAX_BYTES) || { echo "ERROR: $@ exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
