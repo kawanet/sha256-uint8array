@@ -83,7 +83,7 @@ npm run build
 REPEAT=10000 node --test test/99.benchmark.test.ts
 
 # run tests and the benchmark on browser
-npm run test-browser
+open browser/tests.html
 ```
 
 ## WEB BROWSERS

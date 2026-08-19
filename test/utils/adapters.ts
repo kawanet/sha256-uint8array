@@ -75,6 +75,10 @@ export class Crypto implements Adapter {
 export class CreateHash implements Adapter {
     private createHash = createHashBrowser;
     noDataView = true;
+    // A Node crypto shim rather than a browser implementation, so it sits
+    // out of the browser comparison the same way node:crypto does.
+    noString = isBrowser;
+    noBinary = isBrowser;
 
     hash(data: string | Uint8Array): string {
         return this.createHash("sha256").update(data).digest("hex");

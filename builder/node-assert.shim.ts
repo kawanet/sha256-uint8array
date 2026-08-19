@@ -1,11 +1,11 @@
-// Browser-side stand-in for `node:assert`, swapped in when the test
-// bundle is built. The suites import it as
+// Browser-side stand-in for `node:assert`, aliased in by the rollup test
+// config. The suites import it as
 // `import {strict as assert} from "node:assert"`, so only the `strict`
 // surface they actually reach is provided here.
 
-exports.strict = {
+export const strict = {
     // Mirrors `assert.ok(value, message?)`.
-    ok(value, message) {
+    ok(value: unknown, message?: string): void {
         if (!value) {
             throw new Error(message || "expected truthy, got " + JSON.stringify(value));
         }
@@ -13,7 +13,7 @@ exports.strict = {
 
     // node:assert/strict `equal` compares with Object.is semantics, so
     // NaN equals NaN and 0 does not equal -0 — both unlike `===`.
-    equal(actual, expected, message) {
+    equal(actual: unknown, expected: unknown, message?: string): void {
         if (!Object.is(actual, expected)) {
             throw new Error(message || "expected " + JSON.stringify(expected) + ", got " + JSON.stringify(actual));
         }
@@ -21,8 +21,8 @@ exports.strict = {
 
     // Verifies `block` throws. A RegExp is matched against the thrown
     // message; an Error subclass is checked with instanceof.
-    throws(block, expected) {
-        let thrown;
+    throws(block: () => void, expected?: RegExp | (new (...args: unknown[]) => Error)): void {
+        let thrown: unknown;
         let didThrow = false;
         try {
             block();
@@ -46,7 +46,7 @@ exports.strict = {
     },
 
     // Verifies `block` completes normally.
-    doesNotThrow(block) {
+    doesNotThrow(block: () => void): void {
         block();
     },
 };
