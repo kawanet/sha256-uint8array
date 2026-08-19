@@ -21,7 +21,7 @@ const rollupConfig: RollupOptions = {
      */
     external: [
         "@aws-crypto/sha256-js",
-        // "@noble/hashes/sha2.js"
+        "@noble/hashes/sha2.js",
         // "create-hash/browser.js"
         // "crypto-js"
         // "fast-sha256"
@@ -37,7 +37,7 @@ const rollupConfig: RollupOptions = {
         format: "iife",
         globals: {
             "@aws-crypto/sha256-js": "aws_crypto_sha256",
-            // "@noble/hashes/sha2.js": "@noble_hashes_sha2",
+            "@noble/hashes/sha2.js": "noble_hashes_sha2",
             // "create-hash/browser.js": "create_hash_browser",
             // "crypto-js": "crypto_js",
             // "fast-sha256": "fast_sha256",
