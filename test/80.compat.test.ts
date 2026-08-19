@@ -22,9 +22,15 @@ describe(TITLE, () => {
 
     it("sha.js", testFor(new A.ShaJS()));
 
-    it("create-hash/browser", testFor(new A.CreateHash()));
+    it("@noble/hashes", testFor(new A.Noble()));
 
-    it("jshashes", testFor(new A.JsHashes()));
+    it("node-forge", testFor(new A.NodeForge()));
+
+    it("fast-sha256", testFor(new A.FastSha256()));
+
+    it("js-sha256", testFor(new A.JsSha256()));
+
+    it("create-hash/browser", testFor(new A.CreateHash()));
 
     it("@aws-crypto/sha256-js", testFor(new A.AwsCrypto()));
 });
