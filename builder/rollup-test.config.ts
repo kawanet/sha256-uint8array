@@ -23,7 +23,7 @@ const rollupConfig: RollupOptions = {
         "@aws-crypto/sha256-js",
         "@noble/hashes/sha2.js",
         // "create-hash/browser.js"
-        // "crypto-js"
+        "crypto-js",
         // "fast-sha256"
         // "hash.js/lib/hash/sha/256.js"
         "js-sha256",
@@ -39,7 +39,7 @@ const rollupConfig: RollupOptions = {
             "@aws-crypto/sha256-js": "aws_crypto_sha256",
             "@noble/hashes/sha2.js": "noble_hashes_sha2",
             // "create-hash/browser.js": "create_hash_browser",
-            // "crypto-js": "crypto_js",
+            "crypto-js": "crypto_js",
             // "fast-sha256": "fast_sha256",
             // "hash.js/lib/hash/sha/256.js": "hash_js_lib_hash_sha_256",
             "js-sha256": "js_sha256",
