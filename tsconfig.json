@@ -13,6 +13,11 @@
     "removeComments": false,
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "target": "ES2021"
+    "target": "ES2022",
+    "types": [
+      "node",
+      "mocha"
+    ]
+
   }
 }

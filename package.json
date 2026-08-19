@@ -11,19 +11,19 @@
   ],
   "devDependencies": {
     "@aws-crypto/sha256-js": "^3.0.0",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^18.14.0",
-    "browserify": "^17.0.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.13.3",
+    "browserify": "^17.0.1",
     "browserify-sed": "^0.8.0",
     "create-hash": "^1.2.0",
     "crypto-js": "^4.1.1",
     "hash.js": "^1.1.7",
     "jshashes": "^1.0.8",
     "jssha": "^3.3.1",
-    "mocha": "^10.2.0",
+    "mocha": "^11.8.0",
     "sha.js": "^2.4.11",
-    "terser": "^5.19.2",
-    "typescript": "^5.9.3"
+    "terser": "^5.50.0",
+    "typescript": "^6.0.3"
   },
   "exports": {
     ".": {
