@@ -15,7 +15,7 @@ export interface Adapter {
 export interface AsyncAdapter {
     noBinary?: boolean;
 
-    hash(data: Uint8Array): Promise<string>;
+    hash(data: Uint8Array<ArrayBuffer>): Promise<string>;
 }
 
 const isBrowser = ("undefined" !== typeof window);
@@ -156,7 +156,7 @@ export class SubtleCrypto implements AsyncAdapter {
     noString = true;
     noBinary = !hasSubtle;
 
-    async hash(data: Uint8Array): Promise<string> {
+    async hash(data: Uint8Array<ArrayBuffer>): Promise<string> {
         const digest = await crypto.subtle.digest("SHA-256", data);
         return arrayToHex(new Uint8Array(digest));
     }
