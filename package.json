@@ -23,7 +23,7 @@
     "mocha": "^10.2.0",
     "sha.js": "^2.4.11",
     "terser": "^5.19.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.9.3"
   },
   "exports": {
     ".": {
