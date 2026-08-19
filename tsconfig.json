@@ -3,7 +3,12 @@
     "./lib",
     "./test"
   ],
+  "exclude": [
+    "node_modules/"
+  ],
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "module": "CommonJS",
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -11,8 +16,13 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": false,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "target": "ES2021"
+    "target": "ES2022",
+    "types": [
+      "node",
+      "mocha"
+    ]
   }
 }
