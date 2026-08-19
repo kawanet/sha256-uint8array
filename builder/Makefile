@@ -148,5 +148,6 @@ test-full: all smoke
 
 clean:
 	/bin/rm -fr $(ALL)
+	$(MAKE) -C ../browser/vendor $@
 
 .PHONY: all clean test smoke smoke-mjs smoke-cjs smoke-minjs test-full is-buildable is-not-buildable
