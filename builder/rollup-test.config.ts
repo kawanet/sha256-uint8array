@@ -20,7 +20,7 @@ const rollupConfig: RollupOptions = {
      * test/utils/adapters.ts
      */
     external: [
-        // "@aws-crypto/sha256-js"
+        "@aws-crypto/sha256-js",
         // "@noble/hashes/sha2.js"
         // "create-hash/browser.js"
         // "crypto-js"
@@ -36,7 +36,7 @@ const rollupConfig: RollupOptions = {
         file: "../browser/tests/bundled.js",
         format: "iife",
         globals: {
-            // "@aws-crypto/sha256-js": "aws_crypto_sha256",
+            "@aws-crypto/sha256-js": "aws_crypto_sha256",
             // "@noble/hashes/sha2.js": "@noble_hashes_sha2",
             // "create-hash/browser.js": "create_hash_browser",
             // "crypto-js": "crypto_js",

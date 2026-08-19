@@ -1,4 +1,5 @@
 ALL := \
+	aws_crypto_sha256.js \
 	js_sha256.js \
 	jssha_dist_sha256.js \
 	sha_js_sha256.js \
@@ -6,6 +7,13 @@ ALL := \
 ####
 
 all: $(ALL)
+
+aws_crypto_sha256.js: ../../node_modules/@aws-crypto/sha256-js/build/index.js
+	../../node_modules/.bin/rollup --name aws_crypto_sha256 \
+	-p 'node-resolve={browser:true,preferBuiltins:false}' \
+	-p 'commonjs' \
+	--format iife $< -o $@
+	@ls -l $@
 
 js_sha256.js: ../../node_modules/js-sha256/build/sha256.js
 	../../node_modules/.bin/rollup --name js_sha256 \
