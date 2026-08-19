@@ -5,15 +5,19 @@ SHELL := bash
 SRC   := $(wildcard ../lib/*.ts)
 TYPES := $(wildcard ../types/*.d.ts)
 BUILDER_SRC := $(wildcard ./*.ts)
+TEST_SRC := $(wildcard ../test/*.ts) $(wildcard ../test/utils/*.ts)
+BROWSER_SRC := $(wildcard ../browser/*.js)
 
 MJS_DST   := ../dist/sha256-uint8array.mjs
 CJS_DST   := ../dist/sha256-uint8array.cjs
 MINJS_DST := ../dist/sha256-uint8array.min.js
 PKG_DST   := ../dist/package.json
+TEST_DST  := ../browser/tests/bundled.js
 
 MJS_CONFIG   := ./rollup-mjs.config.ts
 CJS_CONFIG   := ./rollup-cjs.config.ts
 MINJS_CONFIG := ./rollup-minjs.config.ts
+TEST_CONFIG  := ./rollup-test.config.ts
 
 # Documented named export that must be verified in every bundle.
 NAMED_EXPORTS := createHash
@@ -30,7 +34,12 @@ CJS_MAX_BYTES   := 16000
 # the README advertises.
 MINJS_MAX_BYTES := 6000
 
-ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST)
+# The browser test bundle inlines the suites, the shims and every
+# implementation the benchmark compares against, so it is large by design.
+# The cap only guards against a step change.
+TEST_MAX_BYTES := 800000
+
+ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST) $(TEST_DST)
 
 # Build/test paths require Node's native TypeScript type-strip (default on
 # Node 22.18+). Older runtimes (e.g. Node 20) report BUILDABLE=NO and can
@@ -79,6 +88,16 @@ $(PKG_DST):
 	@mkdir -p $(dir $@)
 	echo '{"type":"commonjs"}' > $@
 	@ls -l $@
+	@echo ""
+
+# Bundle loaded by browser/tests.html. The suites run unmodified: the
+# rollup config swaps the Node-only pieces for local stand-ins, and the
+# package resolves to the global that dist/*.min.js leaves behind.
+$(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(BROWSER_SRC) $(MINJS_DST)
+	@mkdir -p $(dir $@)
+	../node_modules/.bin/rollup -c $<
+	@ls -l $@
+	@test "$$(wc -c < $@)" -le $(TEST_MAX_BYTES) || { echo "ERROR: $@ exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
 ####
