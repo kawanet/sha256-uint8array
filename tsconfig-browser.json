@@ -1,0 +1,26 @@
+{
+  "//": "Only the browserify path uses this. browserify needs JavaScript input, so the tests are emitted to build/cjs/ before bundling; the package build itself never runs tsc.",
+  "include": [
+    "test/",
+    "types/"
+  ],
+  "exclude": [
+    "node_modules/"
+  ],
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "module": "CommonJS",
+    "outDir": "build/cjs/",
+    "resolveJsonModule": true,
+    "rewriteRelativeImportExtensions": true,
+    "rootDir": ".",
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "target": "ES2022",
+    "types": [
+      "node"
+    ]
+  }
+}

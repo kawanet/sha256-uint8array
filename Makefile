@@ -1,49 +1,40 @@
-#!/usr/bin/env bash -c make
+# Auxiliary targets that sit outside the package build in builder/.
+#
+# Both still go through browserify. The size comparison bundles competing
+# implementations the way a browser consumer would get them, and the
+# browser test page needs the Node builtins those libraries reach for —
+# neither is something the rollup pipeline in builder/ is set up to do.
 
-ALL=\
-	lib/sha256-uint8array.js \
-	dist/sha256-uint8array.min.js \
-	dist/sha256-uint8array.mjs
+BROWSER_TEST := browser/tests/bundled.js
+CJS_TEST_SRC := build/cjs/test
 
-all: $(ALL)
+SED_TEST   := 's|require\("node:test"\)|require("../../../browser/node-test.shim.js")|g'
+SED_ASSERT := 's|require\("node:assert"\)|require("../../../browser/node-assert.shim.js")|g'
+SED_CRYPTO := 's|require\("node:crypto"\)|require("crypto")|g'
 
-# ES5 - CommonJS for browsers
-dist/sha256-uint8array.min.js: build/bundle.js
-	@mkdir -p dist
-	node_modules/.bin/terser -c -m --mangle-props "regex=/^_/" --ecma 5 -o $@ $<
+all: browser-test
 
-build/bundle.js: build/es5/sha256-uint8array.js
-	echo 'var SHA256 = ("undefined" !== typeof exports ? exports : {});' > $@
-	echo '!(function(exports) {' >> $@
-	cat $< >> $@
-	echo '})(SHA256)' >> $@
-	perl -i -pe 's#^("use strict"|Object.defineProperty|exports.*= void 0)#// $$&#' $@
+# Bundle for browser/tests.html. The suites are written against node:test
+# and the package's public entrypoint, so browserify is pointed at local
+# stand-ins for both: mocha-backed shims for the test globals, and
+# browser/import.js for the global the minified build leaves behind.
+browser-test: $(BROWSER_TEST)
 
-# ES5 - CommonJS
-build/es5/%.js: lib/%.ts
-	node_modules/.bin/tsc -p tsconfig-es5.json
+$(BROWSER_TEST): $(wildcard test/*.ts) $(wildcard test/utils/*.ts) $(wildcard browser/*.js)
+	$(MAKE) -C builder
+	node_modules/.bin/tsc -p tsconfig-browser.json
+	@mkdir -p $(dir $@)
+	node_modules/.bin/browserify -o $@ \
+		-r ./browser/import.js:sha256-uint8array \
+		-t [ browserify-sed $(SED_TEST) ] \
+		-t [ browserify-sed $(SED_ASSERT) ] \
+		-t [ browserify-sed $(SED_CRYPTO) ] \
+		$(CJS_TEST_SRC)/*.test.js
+	@ls -l $@
 
-# ES2021 - ES Module
-build/esm/%.js:
-	node_modules/.bin/tsc -p tsconfig-esm.json
-
-# ES2021 - ES Module
-dist/%.mjs: build/esm/%.js
-	cp $^ $@
-
-build/test.js: all
-	node_modules/.bin/browserify --list test/*.js \
-		-t [ browserify-sed 's#(require\("(?:../)+)("\))#$$1browser/import$$2#' ] | grep -v node_modules/ | sort
-	node_modules/.bin/browserify -o $@ test/*.js \
-		-t [ browserify-sed 's#(require\("(?:../)+)("\))#$$1browser/import$$2#' ]
-
-# ES2021 - CommonJS
-lib/%.js: lib/%.ts
-	node_modules/.bin/tsc -p tsconfig.json
-
-clean:
-	/bin/rm -fr $(ALL) build/ lib/*.js test/*.js
-
+# Minified size of this package next to the alternatives, as quoted in the
+# README. Each library is measured the way a browser build would ship it,
+# so the ones published only as CommonJS go through browserify first.
 sizes:
 	wc -c dist/sha256-uint8array.min.js
 	cat node_modules/crypto-js/*.js | node_modules/.bin/terser -c -m | wc -c
@@ -54,9 +45,7 @@ sizes:
 	node_modules/.bin/browserify node_modules/create-hash/browser.js | node_modules/.bin/terser -c -m | wc -c
 	node_modules/.bin/browserify node_modules/@aws-crypto/sha256-js/build/index.js | node_modules/.bin/terser -c -m | wc -c
 
-test: all
-	node_modules/.bin/mocha test/*.js
-	node -e 'import("./dist/sha256-uint8array.mjs").then(x => console.log(x.createHash().digest("hex")))'
-	node -e 'console.log(require("./dist/sha256-uint8array.min.js").createHash().digest("hex"))'
+clean:
+	/bin/rm -fr build/ $(BROWSER_TEST)
 
-.PHONY: all clean test
+.PHONY: all browser-test sizes clean
