@@ -20,6 +20,7 @@ const rollupConfig: RollupOptions = {
      * test/utils/adapters.ts
      */
     external: [
+        "jssha/dist/sha256",
         "sha.js/sha256.js",
     ],
 
@@ -27,6 +28,7 @@ const rollupConfig: RollupOptions = {
         file: "../browser/tests/bundled.js",
         format: "iife",
         globals: {
+            "jssha/dist/sha256": "jssha_dist_sha256",
             "sha.js/sha256.js": "sha_js_sha256",
         }
     },
