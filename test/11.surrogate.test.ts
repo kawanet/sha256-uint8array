@@ -1,10 +1,12 @@
-#!/usr/bin/env mocha -R spec
+import {describe, it} from "node:test"
 
-import {strict as assert} from "assert";
-import * as crypto from "crypto";
-import {createHash} from "../";
+import {strict as assert} from "node:assert";
+import * as crypto from "node:crypto";
+import {createHash} from "sha256-uint8array";
 
-const TITLE = __filename.split("/").pop()!!;
+// Suite label. Kept a literal so the CommonJS build for the browser
+// bundle does not need import.meta.
+const TITLE = "11.surrogate.test.ts";
 
 /**
  * Unicode's surrogate pair is a pair of 16bit characters in JavaScript.

@@ -1,10 +1,13 @@
-#!/usr/bin/env mocha -R spec
+import {describe, it} from "node:test"
+import type {TestContext} from "node:test"
 
-import {strict as assert} from "assert";
-import * as A from "./utils/adapters";
-import {arrayToArrayBuffer} from "./utils/utils";
+import {strict as assert} from "node:assert";
+import * as A from "./utils/adapters.ts";
+import {arrayToArrayBuffer} from "./utils/utils.ts";
 
-const TITLE = __filename.split("/").pop()!!;
+// Suite label. Kept a literal so the CommonJS build for the browser
+// bundle does not need import.meta.
+const TITLE = "80.compat.test.ts";
 
 describe(TITLE, () => {
     it("crypto", testFor(new A.Crypto()));
@@ -27,8 +30,8 @@ describe(TITLE, () => {
 });
 
 function testFor(adapter: A.Adapter) {
-    return function (this: Mocha.Context): void {
-        if (adapter.noString) return this.skip();
+    return (t: TestContext): void => {
+        if (adapter.noString) return t.skip();
 
         {
             const input = ""; // 0 byte

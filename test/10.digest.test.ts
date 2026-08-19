@@ -1,11 +1,13 @@
-#!/usr/bin/env mocha -R spec
+import {describe, it} from "node:test"
 
-import {strict as assert} from "assert";
-import * as crypto from "crypto";
-import {createHash} from "../";
-import {MAKURANOSOSHI} from "./utils/sample-text";
+import {strict as assert} from "node:assert";
+import * as crypto from "node:crypto";
+import {createHash} from "sha256-uint8array";
+import {MAKURANOSOSHI} from "./utils/sample-text.ts";
 
-const TITLE = __filename.split("/").pop()!!;
+// Suite label. Kept a literal so the CommonJS build for the browser
+// bundle does not need import.meta.
+const TITLE = "10.digest.test.ts";
 
 describe(TITLE, () => {
     it("0 byte to hex", () => {

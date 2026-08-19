@@ -1,10 +1,13 @@
-#!/usr/bin/env mocha -R spec
+import {describe, it, before} from "node:test"
+import type {TestContext} from "node:test"
 
-import {strict as assert} from "assert";
-import * as A from "./utils/adapters";
-import {MAKURANOSOSHI} from "./utils/sample-text";
+import {strict as assert} from "node:assert";
+import * as A from "./utils/adapters.ts";
+import {MAKURANOSOSHI, SAMPLE_JSON} from "./utils/sample-text.ts";
 
-const TITLE = __filename.split("/").pop()!!;
+// Suite label. Kept a literal so the CommonJS build for the browser
+// bundle does not need import.meta.
+const TITLE = "99.benchmark.test.ts";
 
 const isBrowser = ("undefined" !== typeof window);
 const isLegacy = ("function" !== typeof TextEncoder);
@@ -14,7 +17,7 @@ const stringToArray = (str: string) => Array.from(unescape(encodeURIComponent(st
 
 describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
 
-    const sampleJSON = JSON.stringify(require("../package.json"));
+    const sampleJSON = SAMPLE_JSON;
     const binaryJSON = new Uint8Array(stringToArray(sampleJSON));
     const expectJSON = (new A.Crypto()).hash(sampleJSON);
 
@@ -48,9 +51,8 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
     });
 
     function testFor(adapter: A.Adapter) {
-        return function (this: Mocha.Context): void {
-            if (adapter.noString) return this.skip();
-            this.timeout(10000);
+        return (t: TestContext): void => {
+            if (adapter.noString) return t.skip();
 
             for (let i = 0; i < REPEAT; i++) {
                 assert.equal(adapter.hash(sampleJSON), expectJSON);
@@ -60,9 +62,8 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
     }
 
     function testBinary(adapter: A.Adapter) {
-        return function (this: Mocha.Context): void {
-            if (adapter.noBinary) return this.skip();
-            this.timeout(10000);
+        return (t: TestContext): void => {
+            if (adapter.noBinary) return t.skip();
 
             for (let i = 0; i < REPEAT; i++) {
                 assert.equal(adapter.hash(binaryJSON), expectJSON);
@@ -72,9 +73,8 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
     }
 
     function testAsync(adapter: A.AsyncAdapter) {
-        return async function (this: Mocha.Context): Promise<void> {
-            if (adapter.noBinary) return this.skip();
-            this.timeout(10000);
+        return async (t: TestContext): Promise<void> => {
+            if (adapter.noBinary) return t.skip();
 
             for (let i = 0; i < REPEAT; i++) {
                 assert.equal(await adapter.hash(binaryJSON), expectJSON);

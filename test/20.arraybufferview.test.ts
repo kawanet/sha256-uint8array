@@ -1,10 +1,12 @@
-#!/usr/bin/env mocha -R spec
+import {describe, it} from "node:test"
 
-import {strict as assert} from "assert";
-import {createHash} from "../";
-import {stringToArrayBuffer} from "./utils/utils";
+import {strict as assert} from "node:assert";
+import {createHash} from "sha256-uint8array";
+import {stringToArrayBuffer} from "./utils/utils.ts";
 
-const TITLE = __filename.split("/").pop()!!;
+// Suite label. Kept a literal so the CommonJS build for the browser
+// bundle does not need import.meta.
+const TITLE = "20.arraybufferview.test.ts";
 
 describe(TITLE, () => {
     const buffer = stringToArrayBuffer("ABCDEFGH");
@@ -52,7 +54,7 @@ describe(TITLE, () => {
     });
 
     function testFor(offset: number) {
-        return function (this: Mocha.Context): void {
+        return (): void => {
             const word = new Uint8Array(buffer, offset, 4).slice();
             const expected = createHash().update(word).digest("hex");
 
