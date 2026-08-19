@@ -77,14 +77,15 @@ You could run the benchmark as below.
 git clone https://github.com/kawanet/sha256-uint8array.git
 cd sha256-uint8array
 npm install
-npm run build
 
-# run the benchmark on Node.js
-REPEAT=10000 ./node_modules/.bin/mocha test/99.benchmark.js
+# run the tests, with the benchmark kept short
+npm test
 
-# run tests and the benchmark on browser
-make -C browser
-open browser/test.html
+# run the benchmark with enough repetitions to compare
+REPEAT=10000 npm test
+
+# run the tests and the benchmark on a browser
+npm run test-browser
 ```
 
 ## WEB BROWSERS
@@ -147,7 +148,7 @@ const hash = crypto.createHash("sha256").update("").digest("hex");
 
 ## MIT LICENSE
 
-Copyright (c) 2020-2023 Yusuke Kawasaki
+Copyright (c) 2020-2026 Yusuke Kawasaki
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
