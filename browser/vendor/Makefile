@@ -20,6 +20,7 @@ aws_crypto_sha256.js: ../../node_modules/@aws-crypto/sha256-js/build/index.js
 	-p 'commonjs' \
 	--format iife $< -o $@
 	@ls -l $@
+	@printf "=> "; ../../node_modules/.bin/terser -c -m < $@ | wc -c
 
 crypto_js.js: ../../node_modules/crypto-js/index.js
 	../../node_modules/.bin/rollup --name crypto_js \
@@ -27,6 +28,7 @@ crypto_js.js: ../../node_modules/crypto-js/index.js
 	-p 'commonjs' \
 	--format iife $< -o $@
 	@ls -l $@
+	@printf "=> "; ../../node_modules/.bin/terser -c -m < $@ | wc -c
 
 fast_sha256.js: ../../node_modules/fast-sha256/sha256.js
 	../../node_modules/.bin/rollup --name fast_sha256 \
@@ -34,6 +36,7 @@ fast_sha256.js: ../../node_modules/fast-sha256/sha256.js
 	-p 'commonjs' \
 	--format iife $< -o $@
 	@ls -l $@
+	@printf "=> "; ../../node_modules/.bin/terser -c -m < $@ | wc -c
 
 hash_js_lib_hash_sha_256.js: ../../node_modules/hash.js/lib/hash/sha/256.js
 	../../node_modules/.bin/rollup --name hash_js_lib_hash_sha_256 \
@@ -41,6 +44,7 @@ hash_js_lib_hash_sha_256.js: ../../node_modules/hash.js/lib/hash/sha/256.js
 	-p 'commonjs' \
 	--format iife $< -o $@
 	@ls -l $@
+	@printf "=> "; ../../node_modules/.bin/terser -c -m < $@ | wc -c
 
 js_sha256.js: ../../node_modules/js-sha256/build/sha256.js
 	../../node_modules/.bin/rollup --name js_sha256 \
@@ -48,6 +52,7 @@ js_sha256.js: ../../node_modules/js-sha256/build/sha256.js
 	-p 'commonjs' \
 	--format iife $< -o $@
 	@ls -l $@
+	@printf "=> "; ../../node_modules/.bin/terser -c -m < $@ | wc -c
 
 jssha_dist_sha256.js: ../../node_modules/jssha/dist/sha256.js
 	../../node_modules/.bin/rollup --name jssha_dist_sha256 \
@@ -55,6 +60,7 @@ jssha_dist_sha256.js: ../../node_modules/jssha/dist/sha256.js
 	-p 'commonjs' \
 	--format iife $< -o $@
 	@ls -l $@
+	@printf "=> "; ../../node_modules/.bin/terser -c -m < $@ | wc -c
 
 noble_hashes_sha2.js: ../../node_modules/@noble/hashes/sha2.js
 	../../node_modules/.bin/rollup --name noble_hashes_sha2 \
@@ -62,6 +68,7 @@ noble_hashes_sha2.js: ../../node_modules/@noble/hashes/sha2.js
 	-p 'commonjs' \
 	--format iife $< -o $@
 	@ls -l $@
+	@printf "=> "; ../../node_modules/.bin/terser -c -m < $@ | wc -c
 
 noble_hashes_utils.js: ../../node_modules/@noble/hashes/utils.js
 	../../node_modules/.bin/rollup --name noble_hashes_utils \
@@ -69,6 +76,7 @@ noble_hashes_utils.js: ../../node_modules/@noble/hashes/utils.js
 	-p 'commonjs' \
 	--format iife $< -o $@
 	@ls -l $@
+	@printf "=> "; ../../node_modules/.bin/terser -c -m < $@ | wc -c
 
 node_forge_lib_sha256.js: ../../node_modules/node-forge/lib/sha256.js
 	../../node_modules/.bin/rollup --name node_forge_lib_sha256 \
@@ -76,6 +84,7 @@ node_forge_lib_sha256.js: ../../node_modules/node-forge/lib/sha256.js
 	-p 'commonjs' \
 	--format iife $< -o $@
 	@ls -l $@
+	@printf "=> "; ../../node_modules/.bin/terser -c -m < $@ | wc -c
 
 sha_js_sha256.js: ../../node_modules/sha.js/sha256.js
 	../../node_modules/.bin/rollup --name sha_js_sha256 \
@@ -83,6 +92,7 @@ sha_js_sha256.js: ../../node_modules/sha.js/sha256.js
 	-p 'commonjs' \
 	--format iife $< -o $@
 	@ls -l $@
+	@printf "=> "; ../../node_modules/.bin/terser -c -m < $@ | wc -c
 
 ####
 
