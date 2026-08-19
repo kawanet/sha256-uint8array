@@ -25,7 +25,7 @@ const rollupConfig: RollupOptions = {
         // "create-hash/browser.js"
         "crypto-js",
         "fast-sha256",
-        // "hash.js/lib/hash/sha/256.js"
+        "hash.js/lib/hash/sha/256.js",
         "js-sha256",
         "jssha/dist/sha256",
         // "node-forge/lib/sha256.js"
@@ -41,7 +41,7 @@ const rollupConfig: RollupOptions = {
             // "create-hash/browser.js": "create_hash_browser",
             "crypto-js": "crypto_js",
             "fast-sha256": "fast_sha256",
-            // "hash.js/lib/hash/sha/256.js": "hash_js_lib_hash_sha_256",
+            "hash.js/lib/hash/sha/256.js": "hash_js_lib_hash_sha_256",
             "js-sha256": "js_sha256",
             "jssha/dist/sha256": "jssha_dist_sha256",
             // "node-forge/lib/sha256.js": "node_forge_lib_sha256",
