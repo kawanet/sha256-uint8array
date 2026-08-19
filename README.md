@@ -80,11 +80,10 @@ npm install
 npm run build
 
 # run the benchmark on Node.js
-REPEAT=10000 ./node_modules/.bin/mocha test/99.benchmark.js
+REPEAT=10000 node --test test/99.benchmark.test.ts
 
 # run tests and the benchmark on browser
-make -C browser
-open browser/test.html
+npm run test-browser
 ```
 
 ## WEB BROWSERS
@@ -147,7 +146,7 @@ const hash = crypto.createHash("sha256").update("").digest("hex");
 
 ## MIT LICENSE
 
-Copyright (c) 2020-2023 Yusuke Kawasaki
+Copyright (c) 2020-2026 Yusuke Kawasaki
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation the

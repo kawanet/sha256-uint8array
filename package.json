@@ -1,7 +1,7 @@
 {
   "name": "sha256-uint8array",
   "description": "Fast SHA-256 digest hash based on Uint8Array, pure JavaScript.",
-  "version": "0.10.7",
+  "version": "0.11.0",
   "author": "Yusuke Kawasaki <u-suke@kawa.net>",
   "bugs": {
     "url": "https://github.com/kawanet/sha256-uint8array/issues"
@@ -11,7 +11,9 @@
   ],
   "devDependencies": {
     "@aws-crypto/sha256-js": "^3.0.0",
-    "@types/mocha": "^10.0.10",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-sucrase": "^5.1.0",
+    "@rollup/plugin-terser": "^1.0.0",
     "@types/node": "^24.13.3",
     "browserify": "^17.0.1",
     "browserify-sed": "^0.8.0",
@@ -21,27 +23,40 @@
     "jshashes": "^1.0.8",
     "jssha": "^3.3.1",
     "mocha": "^11.8.0",
+    "rollup": "^4.62.4",
     "sha.js": "^2.4.11",
     "terser": "^5.50.0",
+    "ts-refine": "^0.6.1",
     "typescript": "^6.0.3"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=22.18.0",
+      "onFail": "warn"
+    }
+  },
+  "engines": {
+    "node": ">=20"
   },
   "exports": {
     ".": {
-      "require": "./lib/sha256-uint8array.js",
-      "import": {
-        "types": "./types/sha256-uint8array.d.ts",
-        "default": "./dist/sha256-uint8array.mjs"
-      }
+      "types": "./types/sha256-uint8array.d.ts",
+      "require": "./dist/sha256-uint8array.cjs",
+      "import": "./dist/sha256-uint8array.mjs"
     }
   },
   "files": [
     "LICENSE",
     "README.md",
     "browser/import.js",
-    "dist/*.min.js",
-    "dist/*.mjs",
-    "lib/*.js",
-    "types/sha256-uint8array.d.ts"
+    "browser/package.json",
+    "dist/package.json",
+    "dist/sha256-uint8array.cjs",
+    "dist/sha256-uint8array.min.js",
+    "dist/sha256-uint8array.mjs",
+    "lib/*.ts",
+    "types/*.d.ts"
   ],
   "homepage": "https://github.com/kawanet/sha256-uint8array#readme",
   "keywords": [
@@ -52,19 +67,21 @@
     "hash"
   ],
   "license": "MIT",
-  "main": "./lib/sha256-uint8array.js",
-  "module": "./dist/sha256-uint8array.mjs",
+  "main": "./dist/sha256-uint8array.cjs",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kawanet/sha256-uint8array.git"
   },
   "scripts": {
-    "build": "make clean all",
+    "build": "make -C builder",
     "fixpack": "fixpack",
-    "prepack": "npm run build && npm test",
-    "test": "REPEAT=1 make test",
-    "test-browser": "make build/test.js && open browser/test.html"
+    "prepack": "make -C builder is-buildable",
+    "prepare": "make -C builder is-not-buildable 2> /dev/null || make -C builder clean all test",
+    "test": "make -C builder test",
+    "test-browser": "make browser-test && open browser/tests.html",
+    "ts-refine": "./node_modules/.bin/ts-refine format && ./node_modules/.bin/ts-refine imports"
   },
-  "type": "commonjs",
-  "typings": "./types/sha256-uint8array.d.ts"
+  "sideEffects": false,
+  "type": "module",
+  "types": "./types/sha256-uint8array.d.ts"
 }

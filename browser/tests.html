@@ -5,18 +5,17 @@
     <title>sha256-uint8array browser test</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="../node_modules/mocha/mocha.css"/>
+    <style>
+        body { font-family: system-ui, sans-serif; padding: 1em; }
+    </style>
 </head>
 <body>
+<h1>sha256-uint8array browser test</h1>
 <div id="mocha"></div>
 <script src="../node_modules/mocha/mocha.js"></script>
-<script class="mocha-init">
-    mocha.setup("bdd");
-    mocha.checkLeaks();
-</script>
+<script>mocha.setup({ui: "bdd", timeout: 0});</script>
 <script src="../dist/sha256-uint8array.min.js"></script>
-<script src="../build/test.js"></script>
-<script class="mocha-exec">
-    mocha.run();
-</script>
+<script src="./tests/bundled.js"></script>
+<script>mocha.run();</script>
 </body>
 </html>

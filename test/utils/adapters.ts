@@ -2,7 +2,16 @@
  * An interface which has digest() method
  */
 
-import {arrayToHex} from "./utils";
+import {Sha256 as awsSha256} from "@aws-crypto/sha256-js";
+import createHashBrowser from "create-hash/browser.js";
+import cryptoJs from "crypto-js";
+import hashJs from "hash.js/lib/hash/sha/256.js";
+import jsHashes from "jshashes";
+import jsSha from "jssha/dist/sha256";
+import * as nodeCrypto from "node:crypto";
+import shaJs from "sha.js/sha256.js";
+import {createHash as ownCreateHash} from "sha256-uint8array";
+import {arrayToHex} from "./utils.ts";
 
 export interface Adapter {
     noString?: boolean;
@@ -27,10 +36,16 @@ const hasSubtle = ("undefined" !== typeof crypto) && crypto.subtle && ("function
  */
 
 export class SHA256Uint8Array implements Adapter {
-    private createHash = require("../../").createHash;
+    private createHash = ownCreateHash;
 
     hash(data: string | Uint8Array | ArrayBufferView): string {
-        return this.createHash().update(data).digest("hex");
+        const hash = this.createHash();
+        if ("string" === typeof data) {
+            hash.update(data); // same call either way: update() is overloaded, not union-typed
+        } else {
+            hash.update(data);
+        }
+        return hash.digest("hex");
     }
 }
 
@@ -39,12 +54,15 @@ export class SHA256Uint8Array implements Adapter {
  */
 
 export class Crypto implements Adapter {
-    private crypto = require("crypto");
+    private crypto = nodeCrypto;
     noString = isBrowser;
     noBinary = isBrowser;
 
     hash(data: string | Uint8Array | ArrayBufferView): string {
-        return this.crypto.createHash("sha256").update(data).digest("hex");
+        // BinaryLike covers the concrete views rather than the abstract
+        // ArrayBufferView, so narrow before handing the value over.
+        const input = "string" === typeof data ? data : new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+        return this.crypto.createHash("sha256").update(input).digest("hex");
     }
 }
 
@@ -55,7 +73,7 @@ export class Crypto implements Adapter {
  */
 
 export class CreateHash implements Adapter {
-    private createHash = require("create-hash/browser");
+    private createHash = createHashBrowser;
     noDataView = true;
 
     hash(data: string | Uint8Array): string {
@@ -68,7 +86,7 @@ export class CreateHash implements Adapter {
  */
 
 export class CryptoJs implements Adapter {
-    private CryptoJS = require("crypto-js");
+    private CryptoJS = cryptoJs;
     noBinary = true;
 
     hash(data: string): string {
@@ -81,7 +99,7 @@ export class CryptoJs implements Adapter {
  */
 
 export class JsHashes implements Adapter {
-    private Hashes = require("jshashes");
+    private Hashes = jsHashes;
     noBinary = true;
 
     hash(data: string): string {
@@ -94,7 +112,7 @@ export class JsHashes implements Adapter {
  */
 
 export class JsSHA implements Adapter {
-    private sha256 = require("jssha/dist/sha256");
+    private sha256 = jsSha;
     noDataView = true;
 
     hash(data: string | Uint8Array): string {
@@ -110,7 +128,7 @@ export class JsSHA implements Adapter {
  */
 
 export class ShaJS implements Adapter {
-    private sha256 = require("sha.js/sha256");
+    private sha256 = shaJs;
     noDataView = true;
 
     hash(data: string | Uint8Array): string {
@@ -123,7 +141,7 @@ export class ShaJS implements Adapter {
  */
 
 export class HashJs implements Adapter {
-    private sha256 = require("hash.js/lib/hash/sha/256");
+    private sha256 = hashJs;
     noDataView = true;
 
     hash(data: string | Uint8Array): string {
@@ -137,7 +155,7 @@ export class HashJs implements Adapter {
  */
 
 export class AwsCrypto implements Adapter {
-    private Sha256 = (!isLegacy && require("@aws-crypto/sha256-js").Sha256);
+    private Sha256 = awsSha256;
     noString = isLegacy;
     noBinary = isLegacy;
 
