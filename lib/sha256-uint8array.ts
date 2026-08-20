@@ -28,16 +28,16 @@ const K = [
     0x90befffa | 0, 0xa4506ceb | 0, 0xbef9a3f7 | 0, 0xc67178f2 | 0,
 ]
 
-const enum N {
-    inputBytes = 64,
-    inputWords = inputBytes / 4,
-    highIndex = inputWords - 2,
-    lowIndex = inputWords - 1,
-    workWords = 64,
-    allocBytes = 80,
-    allocWords = allocBytes / 4,
-    allocTotal = allocBytes * 100,
-}
+// Hash block/allocation sizes. Plain consts work as-is under Node's
+// type-strip, and minifiers inline them as literals.
+const N_inputBytes = 64
+const N_inputWords = N_inputBytes / 4
+const N_highIndex = N_inputWords - 2
+const N_lowIndex = N_inputWords - 1
+const N_workWords = 64
+const N_allocBytes = 80
+const N_allocWords = N_allocBytes / 4
+const N_allocTotal = N_allocBytes * 100
 
 const algorithms: {[algorithm: string]: number} = {
     sha256: 1,
@@ -68,14 +68,14 @@ export class Hash {
     private _sp = 0; // surrogate pair
 
     constructor() {
-        if (!sharedBuffer || sharedOffset >= N.allocTotal) {
-            sharedBuffer = new ArrayBuffer(N.allocTotal)
+        if (!sharedBuffer || sharedOffset >= N_allocTotal) {
+            sharedBuffer = new ArrayBuffer(N_allocTotal)
             sharedOffset = 0
         }
 
-        this._byte = new Uint8Array(sharedBuffer, sharedOffset, N.allocBytes)
-        this._word = new Int32Array(sharedBuffer, sharedOffset, N.allocWords)
-        sharedOffset += N.allocBytes
+        this._byte = new Uint8Array(sharedBuffer, sharedOffset, N_allocBytes)
+        this._word = new Int32Array(sharedBuffer, sharedOffset, N_allocWords)
+        sharedOffset += N_allocBytes
     }
 
     update(data: string, encoding?: string): this;
@@ -95,15 +95,15 @@ export class Hash {
 
         const byteOffset = data.byteOffset
         const length = data.byteLength
-        let blocks = (length / N.inputBytes) | 0
+        let blocks = (length / N_inputBytes) | 0
         let offset = 0
 
         // longer than 1 block
-        if (blocks && !(byteOffset & 3) && !(this._size % N.inputBytes)) {
-            const block = new Int32Array(data.buffer, byteOffset, blocks * N.inputWords)
+        if (blocks && !(byteOffset & 3) && !(this._size % N_inputBytes)) {
+            const block = new Int32Array(data.buffer, byteOffset, blocks * N_inputWords)
             while (blocks--) {
                 this._int32(block, offset >> 2)
-                offset += N.inputBytes
+                offset += N_inputBytes
             }
             this._size += offset
         }
@@ -128,14 +128,14 @@ export class Hash {
         offset = offset!! | 0
 
         while (offset < length) {
-            const start = this._size % N.inputBytes
+            const start = this._size % N_inputBytes
             let index = start
 
-            while (offset < length && index < N.inputBytes) {
+            while (offset < length && index < N_inputBytes) {
                 _byte[index++] = data[offset++]
             }
 
-            if (index >= N.inputBytes) {
+            if (index >= N_inputBytes) {
                 this._int32(_word)
             }
 
@@ -151,10 +151,10 @@ export class Hash {
         let surrogate = this._sp
 
         for (let offset = 0; offset < length; ) {
-            const start = this._size % N.inputBytes
+            const start = this._size % N_inputBytes
             let index = start
 
-            while (offset < length && index < N.inputBytes) {
+            while (offset < length && index < N_inputBytes) {
                 let code = text.charCodeAt(offset++) | 0
                 if (code < 0x80) {
                     // ASCII characters
@@ -181,9 +181,9 @@ export class Hash {
                 }
             }
 
-            if (index >= N.inputBytes) {
+            if (index >= N_inputBytes) {
                 this._int32(_word)
-                _word[0] = _word[N.inputWords]
+                _word[0] = _word[N_inputWords]
             }
 
             this._size += index - start
@@ -198,15 +198,15 @@ export class Hash {
         let i = 0
         offset = offset!! | 0
 
-        while (i < N.inputWords) {
+        while (i < N_inputWords) {
             W[i++] = swap32(data[offset++])
         }
 
-        for (i = N.inputWords; i < N.workWords; i++) {
+        for (i = N_inputWords; i < N_workWords; i++) {
             W[i] = (gamma1(W[i - 2]) + W[i - 7] + gamma0(W[i - 15]) + W[i - 16]) | 0
         }
 
-        for (i = 0; i < N.workWords; i++) {
+        for (i = 0; i < N_workWords; i++) {
             const T1 = (H + sigma1(E) + ch(E, F, G) + K[i] + W[i]) | 0
             const T2 = (sigma0(A) + maj(A, B, C)) | 0
             H = G
@@ -233,7 +233,7 @@ export class Hash {
     digest(encoding: string): string;
     digest(encoding?: string) {
         const {_byte, _word} = this
-        let i = (this._size % N.inputBytes) | 0
+        let i = (this._size % N_inputBytes) | 0
         _byte[i++] = 0x80
 
         // pad 0 for current word
@@ -242,8 +242,8 @@ export class Hash {
         }
         i >>= 2
 
-        if (i > N.highIndex) {
-            while (i < N.inputWords) {
+        if (i > N_highIndex) {
+            while (i < N_inputWords) {
                 _word[i++] = 0
             }
             i = 0
@@ -251,7 +251,7 @@ export class Hash {
         }
 
         // pad 0 for rest words
-        while (i < N.inputWords) {
+        while (i < N_inputWords) {
             _word[i++] = 0
         }
 
@@ -259,8 +259,8 @@ export class Hash {
         const bits64 = this._size * 8
         const low32 = (bits64 & 0xffffffff) >>> 0
         const high32 = (bits64 - low32) / 0x100000000
-        if (high32) _word[N.highIndex] = swap32(high32)
-        if (low32) _word[N.lowIndex] = swap32(low32)
+        if (high32) _word[N_highIndex] = swap32(high32)
+        if (low32) _word[N_lowIndex] = swap32(low32)
 
         this._int32(_word)
 
@@ -293,7 +293,7 @@ type NS = (num: number) => string
 type NN = (num: number) => number
 type N3N = (x: number, y: number, z: number) => number
 
-const W = new Int32Array(N.workWords)
+const W = new Int32Array(N_workWords)
 
 let sharedBuffer: ArrayBuffer
 let sharedOffset: number = 0
