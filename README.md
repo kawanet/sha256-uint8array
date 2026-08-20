@@ -66,7 +66,7 @@ Node.js's native `crypto` module definitely runs faster than any others on Node.
 |module|version|node.js V24 string|node.js V24 U8A|Chromium 151 string|Chromium 151 U8A|
 |---|---|---|---|---|---|
 |[crypto](https://nodejs.org/api/crypto.html)|-|31ms 🥇|17ms 🥇|N/A|N/A|
-|[sha256-uint8array](http://github.com/kawanet/sha256-uint8array)|0.11.0|207ms 🥈|137ms|303ms 🥈|173ms|
+|[sha256-uint8array](http://github.com/kawanet/sha256-uint8array)|0.11.0|218ms 🥈|126ms|276ms 🥈|168ms|
 |[crypto-js](https://npmjs.com/package/crypto-js)|4.2.0|545ms|N/A|621ms|N/A|
 |[jssha](https://npmjs.com/package/jssha)|3.3.2|655ms|395ms|538ms|337ms|
 |[hash.js](https://www.npmjs.com/package/hash.js)|1.1.7|627ms|634ms|384ms|487ms|
@@ -139,7 +139,7 @@ via `browser` property of `package.json` of your app if you needs
 }
 ```
 
-It costs only about 4KB, whereas `browserify`'s default `crypto` polyfill
+It costs only less than 4KB, whereas `browserify`'s default `crypto` polyfill
 costs more than 300KB huge even after minified.
 
 ```js
