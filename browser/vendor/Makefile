@@ -16,7 +16,7 @@ ALL := \
 # into "_". $* only has a value while a recipe runs, so this must be = not :=.
 NAME = $(subst /,_,$(subst -,_,$(subst .,_,$(subst @,,$*))))
 
-all: $(ALL)
+all: $(ALL) sizes
 
 lib/%.js: ../../node_modules/%.js
 	@mkdir -p $(dir $@)
@@ -24,12 +24,20 @@ lib/%.js: ../../node_modules/%.js
 	-p 'node-resolve={browser:true,preferBuiltins:false}' \
 	-p 'commonjs' \
 	--format iife $< -o $@
-	@ls -l $@
-	@printf "=> "; ../../node_modules/.bin/terser -c -m < $@ | wc -c
+
+lib/%.min.js: lib/%.js
+	../../node_modules/.bin/terser $< -o $@ -c -m
+	@ls -l $< $@
+
+# The figures the README compatibility table quotes, in KB.
+sizes: $(ALL:.js=.min.js)
+	@for f in $^; do \
+		printf '  %3dKB  %s\n' "$$(( ($$(wc -c < $$f) + 512) / 1024 ))" "$$f"; \
+	done
 
 ####
 
 clean:
 	/bin/rm -fr lib
 
-.PHONY: all clean
+.PHONY: all clean sizes
