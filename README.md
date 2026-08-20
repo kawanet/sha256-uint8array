@@ -2,7 +2,7 @@
 
 [![Node.js CI](https://github.com/kawanet/sha256-uint8array/workflows/Node.js%20CI/badge.svg?branch=main)](https://github.com/kawanet/sha256-uint8array/actions/)
 [![npm version](https://img.shields.io/npm/v/sha256-uint8array)](https://www.npmjs.com/package/sha256-uint8array)
-[![minified size](https://img.shields.io/bundlephobia/min/sha256-uint8array)](https://cdn.jsdelivr.net/npm/sha256-uint8array/dist/sha256-uint8array.min.js)
+[![gzip size](https://img.badgesize.io/https://cdn.jsdelivr.net/npm/sha256-uint8array/dist/sha256-uint8array.min.js?compression=gzip)](https://cdn.jsdelivr.net/npm/sha256-uint8array/dist/sha256-uint8array.min.js)
 
 Fast SHA-256 digest hash based on Uint8Array, pure JavaScript.
 
@@ -40,17 +40,19 @@ It has a better compatibility with Node.js's `crypto` module in its smaller foot
 |---|---|---|---|---|---|---|
 |[crypto](https://nodejs.org/api/crypto.html)|✅ OK|✅ OK|✅ OK|✅ OK|✅ OK|-|
 |[sha256-uint8array](http://github.com/kawanet/sha256-uint8array)|✅ OK|✅ OK|✅ OK|✅ OK|✅ OK|4KB|
-|[crypto-js](https://npmjs.com/package/crypto-js)|✅ OK|🚫 NO|🚫 NO|✅ OK|🚫 NO|109KB|
-|[jssha](https://npmjs.com/package/jssha)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|11KB|
-|[hash.js](https://www.npmjs.com/package/hash.js)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|17KB|
-|[sha.js](https://npmjs.com/package/sha.js)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|27KB|
-|[@noble/hashes](https://www.npmjs.com/package/@noble/hashes)|🚫 NO|✅ OK|🚫 NO|✅ OK|✅ OK|TBD|
-|[node-forge](https://www.npmjs.com/package/node-forge)|✅ OK|🚫 NO|🚫 NO|✅ OK|🚫 NO|TBD|
-|[fast-sha256](https://www.npmjs.com/package/fast-sha256)|🚫 NO|✅ OK|🚫 NO|🚫 NO|✅ OK|TBD|
-|[js-sha256](https://www.npmjs.com/package/js-sha256)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|TBD|
-|[create-hash](https://npmjs.com/package/create-hash)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|95KB|
+|[crypto-js](https://npmjs.com/package/crypto-js)|✅ OK|🚫 NO|🚫 NO|✅ OK|🚫 NO|66KB|
+|[jssha](https://npmjs.com/package/jssha)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|10KB|
+|[hash.js](https://www.npmjs.com/package/hash.js)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|7KB|
+|[sha.js](https://npmjs.com/package/sha.js)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|47KB|
+|[@noble/hashes](https://www.npmjs.com/package/@noble/hashes)|🚫 NO|✅ OK|🚫 NO|✅ OK|✅ OK|11KB|
+|[node-forge](https://www.npmjs.com/package/node-forge)|✅ OK|🚫 NO|🚫 NO|✅ OK|🚫 NO|27KB|
+|[fast-sha256](https://www.npmjs.com/package/fast-sha256)|🚫 NO|✅ OK|🚫 NO|🚫 NO|✅ OK|6KB|
+|[js-sha256](https://www.npmjs.com/package/js-sha256)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|8KB|
 |[@aws-crypto/sha256-js](https://www.npmjs.com/package/@aws-crypto/sha256-js)|✅ OK|✅ OK|🚫 NO|🚫 NO|✅ OK|14KB|
 |[crypto.subtle.digest()](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)|🚫 NO|✅ OK|✅ OK|🚫 NO|🚫 NO|-|
+
+The minified sizes are measured by `make -C browser/vendor`, which bundles
+each library for browsers and runs it through terser.
 
 The W3C standard `crypto.subtle.digest()` API has a different interface which
 [returns](https://github.com/microsoft/TypeScript/blob/master/lib/lib.dom.d.ts)
@@ -61,22 +63,28 @@ The W3C standard `crypto.subtle.digest()` API has a different interface which
 It runs well both on Node.js and browsers.
 Node.js's native `crypto` module definitely runs faster than any others on Node.js, though.
 
-|module|version|node.js V14|Chrome 87|Safari 14|
-|---|---|---|---|---|
-|[crypto](https://nodejs.org/api/crypto.html)|-|93ms 👍|N/A|N/A|
-|[sha256-uint8array](http://github.com/kawanet/sha256-uint8array)|0.10.0|286ms|488ms 👍|271ms 👍|
-|[crypto-js](https://npmjs.com/package/crypto-js)|4.0.0|809ms|935ms|912ms|
-|[jssha](https://npmjs.com/package/jssha)|3.2.0|869ms|943ms|974ms|
-|[hash.js](https://www.npmjs.com/package/hash.js)|1.1.7|642ms|712ms|1,570ms|
-|[sha.js](https://npmjs.com/package/sha.js)|2.4.11|353ms|806ms|3,615ms|
-|[@noble/hashes](https://www.npmjs.com/package/@noble/hashes)|TBD|TBD|TBD|TBD|
-|[node-forge](https://www.npmjs.com/package/node-forge)|TBD|TBD|TBD|TBD|
-|[fast-sha256](https://www.npmjs.com/package/fast-sha256)|TBD|TBD|TBD|TBD|
-|[js-sha256](https://www.npmjs.com/package/js-sha256)|TBD|TBD|TBD|TBD|
+|module|version|node.js V24 string|node.js V24 U8A|Chromium 151 string|Chromium 151 U8A|
+|---|---|---|---|---|---|
+|[crypto](https://nodejs.org/api/crypto.html)|-|31ms 🥇|17ms 🥇|N/A|N/A|
+|[sha256-uint8array](http://github.com/kawanet/sha256-uint8array)|0.11.0|218ms 🥈|126ms|276ms 🥈|168ms|
+|[crypto-js](https://npmjs.com/package/crypto-js)|4.2.0|545ms|N/A|621ms|N/A|
+|[jssha](https://npmjs.com/package/jssha)|3.3.2|655ms|395ms|538ms|337ms|
+|[hash.js](https://www.npmjs.com/package/hash.js)|1.1.7|627ms|634ms|384ms|487ms|
+|[sha.js](https://npmjs.com/package/sha.js)|2.4.12|377ms|363ms|604ms|229ms|
+|[@noble/hashes](https://www.npmjs.com/package/@noble/hashes)|2.3.0|N/A|124ms 🥈|N/A|156ms|
+|[node-forge](https://www.npmjs.com/package/node-forge)|1.4.0|572ms|N/A|502ms|N/A|
+|[fast-sha256](https://www.npmjs.com/package/fast-sha256)|1.3.0|N/A|132ms|N/A|133ms 🥈|
+|[js-sha256](https://www.npmjs.com/package/js-sha256)|1.0.0|-|-|327ms|307ms|
+|[@aws-crypto/sha256-js](https://www.npmjs.com/package/@aws-crypto/sha256-js)|3.0.0|235ms|212ms|225ms 🥇|244ms|
+|[crypto.subtle.digest()](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)|-|N/A|1,484ms|N/A|57ms 🥇|
 
-The benchmark above shows milliseconds for 20,000 times of
-SHA-256 `hex` hash digest generation for approx 1KB string as input.
-It is tested on macOS 10.15.7 Intel Core i7 3.2GHz.
+The benchmark above shows milliseconds for 20,000 SHA-256 `hex` digests per
+cell, each the median of five runs. `REPEAT=10000` hashes two samples per
+round, a 1.9KB JSON string and a 0.9KB UTF-8 text. `N/A` marks an input shape
+the library does not accept, and `-` a library that hands the digest to Node's
+native `crypto` there instead of running its own JavaScript.
+It is tested on Linux aarch64, Node.js v24.19.0 and Chromium 151.
+
 You could run the benchmark as below.
 
 ```sh

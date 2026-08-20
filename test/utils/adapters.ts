@@ -5,7 +5,6 @@
 import {Sha256 as awsSha256} from "@aws-crypto/sha256-js"
 import {sha256 as noble} from "@noble/hashes/sha2.js"
 import {bytesToHex} from "@noble/hashes/utils.js"
-import createHashBrowser from "create-hash/browser.js"
 import cryptoJs from "crypto-js"
 import fastSha256 from "fast-sha256"
 import hashJs from "hash.js/lib/hash/sha/256.js"
@@ -67,25 +66,6 @@ export class Crypto implements Adapter {
         // ArrayBufferView, so narrow before handing the value over.
         const input = "string" === typeof data ? data : new Uint8Array(data.buffer, data.byteOffset, data.byteLength)
         return this.crypto.createHash("sha256").update(input).digest("hex")
-    }
-}
-
-/**
- * https://www.npmjs.com/package/create-hash
- *
- * Note: create-hash/browser calls sha.js internally.
- */
-
-export class CreateHash implements Adapter {
-    private createHash = createHashBrowser;
-    noDataView = true;
-    // A Node crypto shim rather than a browser implementation, so it sits
-    // out of the browser comparison the same way node:crypto does.
-    noString = isBrowser;
-    noBinary = isBrowser;
-
-    hash(data: string | Uint8Array): string {
-        return this.createHash("sha256").update(data).digest("hex")
     }
 }
 
