@@ -12,6 +12,8 @@
     "allowImportingTsExtensions": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "exactOptionalPropertyTypes": true,
+    "isolatedModules": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": true,
@@ -24,9 +26,11 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
+    "strictPropertyInitialization": true,
     "target": "ES2022",
     "types": [
       "node"
-    ]
+    ],
+    "verbatimModuleSyntax": true
   }
 }
