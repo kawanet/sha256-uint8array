@@ -43,5 +43,5 @@ jobs:
           path: .
 
       - run: npm install --ignore-scripts
-      # - run: npm run test-bundled
-      - run: REPEAT=-1 node --test builder/tests/bundled.js
+      - run: find builder/tests dist -type f -exec touch {} +
+      - run: npm run test-bundled
