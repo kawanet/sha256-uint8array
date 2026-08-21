@@ -11,6 +11,9 @@ import {showFiles} from "./show-files.ts"
 
 const here = (path: string): string => fileURLToPath(new URL(path, import.meta.url))
 
+// Bundles the test suites for browser/tests.html: Node builtins become
+// shims, and the package name resolves to the global left behind by
+// dist/*.min.js, so the browser exercises the shipped bundle.
 const rollupConfig: RollupOptions = {
     input: "../test/*.test.ts",
 

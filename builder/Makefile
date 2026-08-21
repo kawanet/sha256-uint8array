@@ -53,13 +53,13 @@ BUILDABLE := $(shell node -e 'console.log(process.features.typescript ? "YES" : 
 # Build all artifacts.
 all: is-buildable $(ALL)
 
-# Gate that fails loudly when type-strip is unavailable; consumed by `all`
-# and by `npm prepack` to refuse packaging on a non-buildable runtime.
+# Gate consumed by `all` and `npm prepack`: fail loudly unless type-strip
+# is available and this is not a NODE_ENV=production install.
 is-buildable:
 	@ [ "$(BUILDABLE)" = "YES" ] && [ "$(NODE_ENV)" != "production" ]
 
-# Inverse gate used by `npm prepare` to short-circuit on a non-buildable
-# runtime so consumer install on Node 20 silently skips build/test.
+# Inverse gate used by `npm prepare`: skip build/test without type-strip
+# or under NODE_ENV=production; build manually in those environments.
 is-not-buildable:
 	@ [ "$(BUILDABLE)" != "YES" ] || [ "$(NODE_ENV)" = "production" ]
 
@@ -103,6 +103,8 @@ $(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(BROWSER_SRC) $(M
 	@test "$$(wc -c < $@)" -le $(TEST_MAX_BYTES) || { echo "ERROR: $@ exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
+# Plain-JS bundle of the test suites, importing the package by name.
+# Runs against dist/ on any supported Node runtime without type-strip.
 $(TESTS_DST): $(TESTS_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(MJS_DST)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
@@ -153,6 +155,8 @@ test-full: all
 	cd .. && node_modules/.bin/ts-refine format --check && node_modules/.bin/ts-refine imports --check
 	cd .. && REPEAT=$${REPEAT:-1} node --test test/*.test.ts
 
+# Run the bundled suites against dist/. CI uses this to cover runtimes
+# older than the build requirement, where the .ts sources cannot run.
 test-bundled: $(TESTS_DST) smoke
 	cd .. && REPEAT=$${REPEAT:-1} node --test builder/tests/bundled.js
 
