@@ -5,35 +5,43 @@ on: [ push, pull_request ]
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [ "22", "24", "26" ]
     steps:
       - uses: actions/checkout@v7
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+      - run: npm install
+      - run: npm run build
+      - run: npm test
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build
+          path: |
+            builder/tests/
+            dist/
+          retention-days: 1
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ "18", "20", "22", "24", "26" ]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
 
-      - run: npm install
-
-      # Note to Copilot: 'npm install' already triggered 'prepare' (clean build).
-      # Tests were skipped during install via npm_command check in Makefile.
-      # We explicitly run 'npm test' here to provide a clear validation entry in CI.
-      - run: npm test
-
-      # Validate runtime compatibility with Node.js 20 (LTS/EOL)
-      - name: Setup Node.js 20 for smoke test
-        if: matrix.node-version == '24'
-        uses: actions/setup-node@v7
+      - uses: actions/download-artifact@v8
         with:
-          node-version: 20
+          name: build
+          path: .
 
-      - name: Run smoke tests on Node.js 20
-        if: matrix.node-version == '24'
-        run: |
-          node -v | grep -q "^v20"
-          rm -rf node_modules package-lock.json
-          npm install
-          make -C builder smoke
+      - run: npm install --ignore-scripts
+      - run: find builder/tests dist -type f -exec touch {} +
+      - run: npm run test-bundled
