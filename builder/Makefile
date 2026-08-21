@@ -13,11 +13,13 @@ CJS_DST   := ../dist/sha256-uint8array.cjs
 MINJS_DST := ../dist/sha256-uint8array.min.js
 PKG_DST   := ../dist/package.json
 TEST_DST  := ../browser/tests/bundled.js
+TESTS_DST := ../builder/tests/bundled.js
 
 MJS_CONFIG   := ./rollup-mjs.config.ts
 CJS_CONFIG   := ./rollup-cjs.config.ts
 MINJS_CONFIG := ./rollup-minjs.config.ts
 TEST_CONFIG  := ./rollup-test.config.ts
+TESTS_CONFIG := ./rollup-tests.config.ts
 
 # Documented named export that must be verified in every bundle.
 NAMED_EXPORTS := createHash
@@ -39,7 +41,7 @@ MINJS_MAX_BYTES := 6000
 # guards against a step change, such as a dependency slipping back in.
 TEST_MAX_BYTES := 60000
 
-ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST) $(TEST_DST)
+ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST) $(TEST_DST) $(TESTS_DST)
 
 # Build/test paths require Node's native TypeScript type-strip (default on
 # Node 22.18+). Older runtimes (e.g. Node 20) report BUILDABLE=NO and can
@@ -54,12 +56,12 @@ all: is-buildable $(ALL)
 # Gate that fails loudly when type-strip is unavailable; consumed by `all`
 # and by `npm prepack` to refuse packaging on a non-buildable runtime.
 is-buildable:
-	@ [ "$(BUILDABLE)" = "YES" ]
+	@ [ "$(BUILDABLE)" = "YES" ] && [ "$(NODE_ENV)" != "production" ]
 
 # Inverse gate used by `npm prepare` to short-circuit on a non-buildable
 # runtime so consumer install on Node 20 silently skips build/test.
 is-not-buildable:
-	@ [ "$(BUILDABLE)" = "NO" ]
+	@ [ "$(BUILDABLE)" != "YES" ] || [ "$(NODE_ENV)" = "production" ]
 
 $(MJS_DST): $(MJS_CONFIG) $(SRC) $(BUILDER_SRC)
 	@mkdir -p $(dir $@)
@@ -96,6 +98,13 @@ $(PKG_DST):
 $(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(BROWSER_SRC) $(MINJS_DST)
 	@mkdir -p $(dir $@)
 	$(MAKE) -C ../browser/vendor
+	../node_modules/.bin/rollup -c $<
+	@ls -l $@
+	@test "$$(wc -c < $@)" -le $(TEST_MAX_BYTES) || { echo "ERROR: $@ exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
+	@echo ""
+
+$(TESTS_DST): $(TESTS_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(MJS_DST)
+	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@
 	@test "$$(wc -c < $@)" -le $(TEST_MAX_BYTES) || { echo "ERROR: $@ exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
@@ -139,10 +148,13 @@ test:
 # The benchmark reads REPEAT and defaults it high enough to produce stable
 # numbers, which is far more work than a correctness run needs. Pin it low
 # here so `npm test` stays quick; `REPEAT=10000 npm test` still measures.
-test-full: all smoke
+test-full: all
 	cd .. && node_modules/.bin/tsc --noEmit
 	cd .. && node_modules/.bin/ts-refine format --check && node_modules/.bin/ts-refine imports --check
 	cd .. && REPEAT=$${REPEAT:-1} node --test test/*.test.ts
+
+test-bundled: $(TESTS_DST) smoke
+	cd .. && REPEAT=$${REPEAT:-1} node --test builder/tests/bundled.js
 
 ####
 
@@ -150,4 +162,4 @@ clean:
 	/bin/rm -fr $(ALL)
 	$(MAKE) -C ../browser/vendor $@
 
-.PHONY: all clean test smoke smoke-mjs smoke-cjs smoke-minjs test-full is-buildable is-not-buildable
+.PHONY: all clean test smoke smoke-mjs smoke-cjs smoke-minjs test-full test-bundled is-buildable is-not-buildable

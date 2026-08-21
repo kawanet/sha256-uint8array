@@ -5,7 +5,7 @@
 ._*
 .idea/
 .vscode/
-build/
+builder/tests/
 dist/
 node_modules/
 npm-debug.log*
