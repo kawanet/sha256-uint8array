@@ -11,6 +11,7 @@ const rollupConfig: RollupOptions = {
         format: "commonjs",
     },
 
+    // Bare specifiers stay external; only relative paths are bundled.
     external: /^[^.\/]/,
 
     plugins: [
