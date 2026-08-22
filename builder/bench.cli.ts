@@ -89,9 +89,11 @@ async function main(): Promise<void> {
         ["crypto.subtle.digest()", new A.SubtleCrypto()],
     ]
 
-    // TARGET picks modules by substring, "self" for this package alone;
-    // the default (empty) measures everything.
-    const picked = ADAPTERS.filter(([name]) => !TARGET || (TARGET === "self" ? name === SELF : name.includes(TARGET)))
+    // TARGET picks modules: comma-separated substrings, with "self"
+    // meaning this package alone; the default measures everything.
+    const wants = TARGET.split(",").map(t => t.trim()).filter(Boolean)
+    const picked = ADAPTERS.filter(([name]) =>
+        !wants.length || wants.some(t => (t === "self") ? name === SELF : name.includes(t)))
 
     const cells: Cell[] = []
     for (const [name, adapter] of picked) {

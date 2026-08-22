@@ -98,7 +98,7 @@ npm run build
 npm run bench
 
 # options via environment variables
-REPEAT=10000 SETS=5 TARGET=sha256-uint8array npm run bench
+REPEAT=10000 SETS=5 TARGET=sha256-uint8array,crypto-js npm run bench
 
 # run the benchmark on a browser, options via the query string
 open browser/bench.html   # ?REPEAT=10000&SETS=5&TARGET=self
