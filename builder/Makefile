@@ -14,7 +14,8 @@ MINJS_DST := ../dist/sha256-uint8array.min.js
 PKG_DST   := ../dist/package.json
 TEST_DST  := ../browser/tests/bundled.js
 TESTS_DST := ../builder/tests/bundled.js
-BENCH_DST := ../builder/tests/bench.mjs ../browser/tests/bench.js
+BUILDER_BENCH_DST := ../builder/tests/bench.mjs
+BROWSER_BENCH_DST := ../browser/tests/bench.js
 
 MJS_CONFIG   := ./rollup-mjs.config.ts
 CJS_CONFIG   := ./rollup-cjs.config.ts
@@ -43,7 +44,7 @@ MINJS_MAX_BYTES := 6000
 # guards against a step change, such as a dependency slipping back in.
 TEST_MAX_BYTES := 60000
 
-ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST) $(TEST_DST) $(TESTS_DST)
+ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST) $(TEST_DST) $(TESTS_DST) $(BUILDER_BENCH_DST) $(BROWSER_BENCH_DST)
 
 # Build/test paths require Node's native TypeScript type-strip (default on
 # Node 22.18+). Older runtimes (e.g. Node 20) report BUILDABLE=NO and can
@@ -114,16 +115,22 @@ $(TESTS_DST): $(TESTS_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(MJS_DST)
 	@test "$$(wc -c < $@)" -le $(TEST_MAX_BYTES) || { echo "ERROR: $@ exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
-# Benchmark runner bundles, built on demand and not part of $(ALL).
-# One config builds both: the Node ESM and the browser IIFE.
-bench: $(BENCH_DST)
+# Benchmark runner bundles. One rollup run emits both files, so the
+# recipe lives on the builder-side file alone: grouped targets (&:)
+# would say this directly but need GNU make 4.3, and macOS ships 3.81.
+bench: $(BUILDER_BENCH_DST) $(BROWSER_BENCH_DST)
 
-$(BENCH_DST) &: $(BENCH_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(MJS_DST) $(MINJS_DST)
+$(BUILDER_BENCH_DST): $(BENCH_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(MJS_DST) $(MINJS_DST)
 	@mkdir -p ../builder/tests ../browser/tests
 	$(MAKE) -C ../browser/vendor
 	../node_modules/.bin/rollup -c $(BENCH_CONFIG)
-	@ls -l $(BENCH_DST)
+	@ls -l $@ $(BROWSER_BENCH_DST)
 	@echo ""
+
+# Tracks the builder-side file; re-runs rollup only if this side is
+# missing, e.g. deleted by hand.
+$(BROWSER_BENCH_DST): $(BUILDER_BENCH_DST)
+	@test -f $@ || ../node_modules/.bin/rollup -c $(BENCH_CONFIG)
 
 ####
 
