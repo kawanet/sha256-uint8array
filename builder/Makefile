@@ -120,7 +120,7 @@ $(TESTS_DST): $(TESTS_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(MJS_DST)
 # would say this directly but need GNU make 4.3, and macOS ships 3.81.
 bench: $(BUILDER_BENCH_DST) $(BROWSER_BENCH_DST)
 
-$(BUILDER_BENCH_DST): $(BENCH_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(MJS_DST) $(MINJS_DST)
+$(BUILDER_BENCH_DST): $(BENCH_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(BROWSER_SRC) $(MJS_DST) $(MINJS_DST)
 	@mkdir -p ../builder/tests ../browser/tests
 	$(MAKE) -C ../browser/vendor
 	../node_modules/.bin/rollup -c $(BENCH_CONFIG)
