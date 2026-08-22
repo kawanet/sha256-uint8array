@@ -18,6 +18,11 @@ const REPEAT = +param("REPEAT", "10000")
 const SETS = +param("SETS", "5")
 const TARGET = param("TARGET", "")
 
+// Garbage in, immediate stop: the caller chose the values.
+if (!(Number.isInteger(REPEAT) && REPEAT > 0 && Number.isInteger(SETS) && SETS > 0)) {
+    throw new Error(`invalid REPEAT=${param("REPEAT", "")} SETS=${param("SETS", "")}`)
+}
+
 const sleep = () => new Promise<void>(resolve => setTimeout(resolve, 0))
 const stringToArray = (str: string) => Array.from(unescape(encodeURIComponent(str)), (c: string) => c.charCodeAt(0))
 const round = (v: number) => Math.round(v * 10) / 10
