@@ -1,7 +1,7 @@
 import {describe, it} from "node:test"
 
 import {strict as assert} from "node:assert"
-import {createHash} from "sha256-uint8array"
+import {createHash} from "../lib/sha256-uint8array.ts"
 import {stringToArrayBuffer} from "./utils/utils.ts"
 
 // Suite label. Kept a literal so the CommonJS build for the browser

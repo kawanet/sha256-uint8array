@@ -13,7 +13,7 @@ import jsSha from "jssha/dist/sha256"
 import forgeSha from "node-forge/lib/sha256.js"
 import * as nodeCrypto from "node:crypto"
 import shaJs from "sha.js/sha256.js"
-import {createHash as ownCreateHash} from "sha256-uint8array"
+import {createHash as ownCreateHash} from "../../lib/sha256-uint8array.ts"
 import {arrayToHex} from "./utils.ts"
 
 export interface Adapter {

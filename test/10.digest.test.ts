@@ -2,7 +2,7 @@ import {describe, it} from "node:test"
 
 import {strict as assert} from "node:assert"
 import * as crypto from "node:crypto"
-import {createHash} from "sha256-uint8array"
+import {createHash} from "../lib/sha256-uint8array.ts"
 import {MAKURANOSOSHI} from "./utils/sample-text.ts"
 
 // Suite label. Kept a literal so the CommonJS build for the browser
