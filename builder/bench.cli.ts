@@ -147,7 +147,7 @@ async function main(): Promise<void> {
     }
 
     const env = ("object" === typeof process && process.version) ? `node ${process.version}` : navigator.userAgent
-    out(`# ${env} DURATION=${DURATION}ms SETS=${SETS} TARGET=${TARGET || "(all)"} UNIT=us/op`)
+    out(`# ${env} DURATION=${DURATION} SETS=${SETS} TARGET=${TARGET || "(all)"} UNIT=us/op`)
 
     const random = mulberry32(SHUFFLE_SEED)
 
