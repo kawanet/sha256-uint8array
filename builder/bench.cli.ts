@@ -18,7 +18,7 @@ const param = (key: string, def: string): string => {
 
 const REPEAT = +param("REPEAT", "10000")
 const SETS = +param("SETS", "5")
-const ONLY = param("ONLY", "")
+const TARGET = param("TARGET", "")
 
 const sleep = () => new Promise<void>(resolve => setTimeout(resolve, 0))
 const stringToArray = (str: string) => Array.from(unescape(encodeURIComponent(str)), (c: string) => c.charCodeAt(0))
@@ -89,7 +89,9 @@ async function main(): Promise<void> {
         ["crypto.subtle.digest()", new A.SubtleCrypto()],
     ]
 
-    const picked = ADAPTERS.filter(([name]) => !ONLY || (ONLY === "self" ? name === SELF : name.includes(ONLY)))
+    // TARGET picks modules by substring, "self" for this package alone;
+    // the default (empty) measures everything.
+    const picked = ADAPTERS.filter(([name]) => !TARGET || (TARGET === "self" ? name === SELF : name.includes(TARGET)))
 
     const cells: Cell[] = []
     for (const [name, adapter] of picked) {
