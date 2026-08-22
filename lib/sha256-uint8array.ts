@@ -332,7 +332,15 @@ const W = new Int32Array(N_workWords)
 let sharedBuffer: ArrayBuffer
 let sharedOffset: number = 0
 
-const hex32: NS = num => (num + 0x100000000).toString(16).substr(-8)
+// Two hex digits per byte value, built once at load. Concatenating four
+// prebuilt pairs avoids Number#toString(16), which runs on the slower
+// double path here because the int32 word is offset beyond 2^32 first.
+const HEX: string[] = []
+for (let i = 0; i < 256; i++) {
+    HEX.push((i + 0x100).toString(16).substr(-2))
+}
+
+const hex32: NS = num => HEX[(num >>> 24)] + HEX[(num >>> 16) & 0xFF] + HEX[(num >>> 8) & 0xFF] + HEX[num & 0xFF]
 const swapLE: NN = (c => (((c << 24) & 0xff000000) | ((c << 8) & 0xff0000) | ((c >> 8) & 0xff00) | ((c >> 24) & 0xff)))
 const swapBE: NN = (c => c)
 const swap32: NN = isBE() ? swapBE : swapLE
