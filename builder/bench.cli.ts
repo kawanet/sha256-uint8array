@@ -98,6 +98,10 @@ async function main(): Promise<void> {
     const wants = TARGET.split(",").map(t => t.trim()).filter(Boolean)
     const picked = ADAPTERS.filter(([name]) => !wants.length || wants.some(t => name.includes(t)))
 
+    if (wants.length && picked.length === 0) {
+        throw new Error(`TARGET matched nothing: ${TARGET}`)
+    }
+
     // Two inputs only. An adapter benches the patterns it supports:
     // the sync implementation when it has one, otherwise the async one
     // in the same rotation, and a cell-less adapter is simply skipped.
@@ -118,12 +122,13 @@ async function main(): Promise<void> {
         const group = cells.filter(cell => cell.input === input)
         if (!group.length) continue
         tick(`# ${input} `)
-        // Adapters take turns within each set so slow drift hits all of
-        // them equally. Each measurement is immediately preceded by one
-        // untimed repeat, absorbing first-load effects and anything
-        // evicted between sets; the median covers the slower JIT tiering.
+        // Adapters take turns within each set; the start index rotates
+        // per set so nobody is pinned to one position under drift. One
+        // untimed repeat precedes each timed run (first-load absorber);
+        // the median covers the slower JIT tiering.
         for (let set = 1; set <= SETS; set++) {
-            for (const cell of group) {
+            for (let turn = 0; turn < group.length; turn++) {
+                const cell = group[(set + turn) % group.length]!
                 await cell.fn(1)
                 const start = performance.now()
                 await cell.fn(REPEAT)
