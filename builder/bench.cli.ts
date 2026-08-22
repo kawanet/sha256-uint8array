@@ -53,7 +53,8 @@ const tick = (chunk: string): void => {
 
 interface Cell {
     name: string;
-    input: "string" | "binary" | "async";
+    input: "string" | "binary";
+    impl: "sync" | "async";
     fn: (n: number) => (void | Promise<void>);
     times: number[];
 }
@@ -92,31 +93,36 @@ async function main(): Promise<void> {
     const wants = TARGET.split(",").map(t => t.trim()).filter(Boolean)
     const picked = ADAPTERS.filter(([name]) => !wants.length || wants.some(t => name.includes(t)))
 
+    // Two inputs only. An adapter benches the patterns it supports:
+    // the sync implementation when it has one, otherwise the async one
+    // in the same rotation, and a cell-less adapter is simply skipped.
     const cells: Cell[] = []
     for (const [name, adapter] of picked) {
         const s = adapter.makeStringBench(stringPairs)
-        if (s) cells.push({name, input: "string", fn: s, times: []})
+        if (s) cells.push({name, input: "string", impl: "sync", fn: s, times: []})
         const b = adapter.makeBinaryBench(binaryPairs)
-        if (b) cells.push({name, input: "binary", fn: b, times: []})
-        const a = adapter.makeAsyncBench(binaryPairs)
-        if (a) cells.push({name, input: "async", fn: a, times: []})
+        const a = b ? null : adapter.makeBinaryBenchAsync(binaryPairs)
+        if (b) cells.push({name, input: "binary", impl: "sync", fn: b, times: []})
+        else if (a) cells.push({name, input: "binary", impl: "async", fn: a, times: []})
     }
 
     const env = ("object" === typeof process && process.version) ? `node ${process.version}` : navigator.userAgent
     out(`# ${env} REPEAT=${REPEAT} SETS=${SETS} TARGET=${TARGET || "(all)"}`)
 
-    for (const input of ["string", "binary", "async"] as const) {
+    for (const input of ["string", "binary"] as const) {
         const group = cells.filter(cell => cell.input === input)
         if (!group.length) continue
         tick(`# ${input} `)
-        // set 0 warms the JIT up and is discarded; adapters take turns
-        // within each set so slow drift hits all of them equally.
-        for (let set = 0; set <= SETS; set++) {
+        // Adapters take turns within each set so slow drift hits all of
+        // them equally. Each measurement is immediately preceded by one
+        // untimed repeat, absorbing first-load effects and anything
+        // evicted between sets; the median covers the slower JIT tiering.
+        for (let set = 1; set <= SETS; set++) {
             for (const cell of group) {
+                await cell.fn(1)
                 const start = performance.now()
                 await cell.fn(REPEAT)
-                const ms = performance.now() - start
-                if (set > 0) cell.times.push(ms)
+                cell.times.push(performance.now() - start)
                 tick("o")
                 await sleep()
             }
@@ -129,6 +135,7 @@ async function main(): Promise<void> {
         out(JSON.stringify({
             name: cell.name,
             input: cell.input,
+            impl: cell.impl,
             repeat: REPEAT,
             sets: cell.times.map(round),
             median: round(med),
@@ -136,9 +143,8 @@ async function main(): Promise<void> {
         }))
     }
 
-    // README-shaped summary: string and U8A columns, with the async
-    // (crypto.subtle) result standing in the U8A column of its row.
-    // The fastest and second-fastest cell per column take the medals.
+    // README-shaped summary: string and U8A columns. The fastest and
+    // second-fastest cell per column take the medals.
     const value = (name: string, input: Cell["input"]): number | null => {
         const cell = cells.find(c => c.name === name && c.input === input)
         return cell ? median(cell.times) : null
@@ -146,7 +152,7 @@ async function main(): Promise<void> {
     const rows = picked.map(([name]) => ({
         name,
         string: value(name, "string"),
-        u8a: value(name, "binary") ?? value(name, "async"),
+        u8a: value(name, "binary"),
     }))
     const format = (row: (typeof rows)[number], col: "string" | "u8a"): string => {
         const v = row[col]

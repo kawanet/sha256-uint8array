@@ -58,7 +58,7 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
         it("@aws-crypto/sha256-js", testBinary(new A.AwsCrypto()))
     })
 
-    describe("makeAsyncBench", () => {
+    describe("makeBinaryBenchAsync", () => {
         it("crypto.subtle.digest()", testAsync(new A.SubtleCrypto()))
     })
 
@@ -80,7 +80,7 @@ describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
 
     function testAsync(adapter: A.Adapter) {
         return async (t: TestContext): Promise<void> => {
-            const bench = adapter.makeAsyncBench(binaryPairs)
+            const bench = adapter.makeBinaryBenchAsync(binaryPairs)
             if (!bench) return t.skip()
             await bench(REPEAT)
         }
