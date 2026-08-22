@@ -16,14 +16,12 @@ const param = (key: string, def: string): string => {
 
 const REPEAT = +param("REPEAT", "10000")
 const SETS = +param("SETS", "10")
-const SEED = +param("SEED", "256")
 const TARGET = param("TARGET", "")
+const SHUFFLE_SEED = 0x53484132 // ASCII "SHA2"
 
 // Garbage in, immediate stop: the caller chose the values.
-if (!(Number.isInteger(REPEAT) && REPEAT > 0 &&
-    Number.isInteger(SETS) && SETS > 0 &&
-    Number.isInteger(SEED) && SEED >= 0 && SEED <= 0xFFFFFFFF)) {
-    throw new Error(`invalid REPEAT=${param("REPEAT", "")} SETS=${param("SETS", "")} SEED=${param("SEED", "")}`)
+if (!(Number.isInteger(REPEAT) && REPEAT > 0 && Number.isInteger(SETS) && SETS > 0)) {
+    throw new Error(`invalid REPEAT=${param("REPEAT", "")} SETS=${param("SETS", "")}`)
 }
 
 const sleep = () => new Promise<void>(resolve => setTimeout(resolve, 0))
@@ -139,9 +137,9 @@ async function main(): Promise<void> {
     }
 
     const env = ("object" === typeof process && process.version) ? `node ${process.version}` : navigator.userAgent
-    out(`# ${env} REPEAT=${REPEAT} SETS=${SETS} SEED=${SEED} TARGET=${TARGET || "(all)"}`)
+    out(`# ${env} REPEAT=${REPEAT} SETS=${SETS} TARGET=${TARGET || "(all)"}`)
 
-    const random = mulberry32(SEED)
+    const random = mulberry32(SHUFFLE_SEED)
 
     for (const input of ["string", "binary"] as const) {
         const group = cells.filter(cell => cell.input === input)
@@ -175,7 +173,6 @@ async function main(): Promise<void> {
             input: cell.input,
             impl: cell.impl,
             repeat: REPEAT,
-            seed: SEED,
             sets: cell.times.map(round),
             median: round(med),
             mad: round(mad(cell.times, med)),
