@@ -8,8 +8,6 @@ import {MAKURANOSOSHI, SAMPLE_JSON} from "../test/utils/sample-text.ts"
  * Emits one NDJSON line per cell, then a Markdown table.
  */
 
-const SELF = "sha256-uint8array"
-
 // Node reads environment variables; a browser reads location.search.
 const param = (key: string, def: string): string => {
     if ("object" === typeof location) return new URLSearchParams(location.search).get(key) ?? def
@@ -76,7 +74,7 @@ async function main(): Promise<void> {
 
     const ADAPTERS: Array<[string, A.Adapter]> = [
         ["crypto", new A.Crypto()],
-        [SELF, new A.SHA256Uint8Array()],
+        ["sha256-uint8array", new A.SHA256Uint8Array()],
         ["crypto-js", new A.CryptoJs()],
         ["jssha", new A.JsSHA()],
         ["hash.js", new A.HashJs()],
@@ -89,11 +87,10 @@ async function main(): Promise<void> {
         ["crypto.subtle.digest()", new A.SubtleCrypto()],
     ]
 
-    // TARGET picks modules: comma-separated substrings, with "self"
-    // meaning this package alone; the default measures everything.
+    // TARGET picks modules by comma-separated substrings;
+    // the default (empty) measures everything.
     const wants = TARGET.split(",").map(t => t.trim()).filter(Boolean)
-    const picked = ADAPTERS.filter(([name]) =>
-        !wants.length || wants.some(t => (t === "self") ? name === SELF : name.includes(t)))
+    const picked = ADAPTERS.filter(([name]) => !wants.length || wants.some(t => name.includes(t)))
 
     const cells: Cell[] = []
     for (const [name, adapter] of picked) {
