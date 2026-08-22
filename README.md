@@ -78,13 +78,12 @@ Node.js's native `crypto` module definitely runs faster than any others on Node.
 |[@aws-crypto/sha256-js](https://www.npmjs.com/package/@aws-crypto/sha256-js)|3.0.0|235ms|212ms|225ms 🥇|244ms|
 |[crypto.subtle.digest()](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)|-|N/A|1,484ms|N/A|57ms 🥇|
 
-The benchmark above shows milliseconds for 20,000 SHA-256 `hex` digests per
-cell: `REPEAT=10000` hashes two samples per round, a 1.9KB JSON string and a
-0.9KB UTF-8 text. Each cell is the median of ten sets, taken in a single
-run; every measurement is preceded by one untimed repeat, which absorbs
-first-load effects. `N/A` marks an input shape
-the library does not accept, and `-` a library that hands the digest to Node's
-native `crypto` there instead of running its own JavaScript.
+The benchmark above shows the median of ten sets, normalized to milliseconds
+per 20,000 SHA-256 `hex` digests. Each cell uses a fixed operation count
+calibrated towards 500ms. Each repeat hashes two samples, a 1.9KB JSON string
+and a 0.9KB UTF-8 text; every measurement is preceded by one untimed repeat
+to absorb first-load effects. `▫️` marks an unsupported input shape, and `⁎₁`
+a cell excluded because it delegates to native crypto instead of JavaScript.
 It is tested on Linux aarch64, Node.js v24.19.0 and Chromium 151.
 
 You could run the benchmark as below.
