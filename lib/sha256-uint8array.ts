@@ -198,19 +198,30 @@ export class Hash {
         let i = 0
         offset = offset!! | 0
 
-        for (i = 0; i < N_workWords; i++) {
-            let w: number
-            if (i < N_inputWords) {
-                w = W[i] = swap32(data[offset++])
-            } else {
-                const j = i & (N_inputWords - 1)
-                w = W[j] = (
-                    gamma1(W[(i - 2) & (N_inputWords - 1)]) +
-                    W[(i - 7) & (N_inputWords - 1)] +
-                    gamma0(W[(i - 15) & (N_inputWords - 1)]) +
-                    W[j]
-                ) | 0
-            }
+        // The 64 rounds run as two loops so the round body carries no
+        // per-round branch: the first 16 load input words, the rest
+        // extend the schedule with direct in-bounds indices into W.
+        for (i = 0; i < N_inputWords; i++) {
+            const w = W[i] = swap32(data[offset++])
+            const T1 = (H + sigma1(E) + ch(E, F, G) + K[i] + w) | 0
+            const T2 = (sigma0(A) + maj(A, B, C)) | 0
+            H = G
+            G = F
+            F = E
+            E = (D + T1) | 0
+            D = C
+            C = B
+            B = A
+            A = (T1 + T2) | 0
+        }
+
+        for (i = N_inputWords; i < N_workWords; i++) {
+            const w = W[i] = (
+                gamma1(W[i - 2]) +
+                W[i - 7] +
+                gamma0(W[i - 15]) +
+                W[i - 16]
+            ) | 0
             const T1 = (H + sigma1(E) + ch(E, F, G) + K[i] + w) | 0
             const T2 = (sigma0(A) + maj(A, B, C)) | 0
             H = G
@@ -297,7 +308,9 @@ type NS = (num: number) => string
 type NN = (num: number) => number
 type N3N = (x: number, y: number, z: number) => number
 
-const W = new Int32Array(N_inputWords)
+// Full 64-word message schedule. The flat layout costs 192 bytes over
+// a 16-word ring but frees the hot loop from masking every index.
+const W = new Int32Array(N_workWords)
 
 let sharedBuffer: ArrayBuffer
 let sharedOffset: number = 0
