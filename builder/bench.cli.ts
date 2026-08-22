@@ -103,7 +103,7 @@ async function main(): Promise<void> {
     }
 
     const env = ("object" === typeof process && process.version) ? `node ${process.version}` : navigator.userAgent
-    out(`# ${env} REPEAT=${REPEAT} SETS=${SETS}`)
+    out(`# ${env} REPEAT=${REPEAT} SETS=${SETS} TARGET=${TARGET || "(all)"}`)
 
     for (const input of ["string", "binary", "async"] as const) {
         const group = cells.filter(cell => cell.input === input)
