@@ -201,37 +201,54 @@ export class Hash {
         // The 64 rounds run as two loops so the round body carries no
         // per-round branch: the first 16 load input words, the rest
         // extend the schedule with direct in-bounds indices into W.
-        for (i = 0; i < N_inputWords; i++) {
-            const w = W[i] = swap32(data[offset++])
-            const T1 = (H + sigma1(E) + ch(E, F, G) + K[i] + w) | 0
+        // Rounds go in pairs: the second reads the first through fresh
+        // bindings, halving the a..h state rotation assignments.
+        for (i = 0; i < N_inputWords; i += 2) {
+            const w0 = W[i] = swap32(data[offset++])
+            const T1 = (H + sigma1(E) + ch(E, F, G) + K[i] + w0) | 0
             const T2 = (sigma0(A) + maj(A, B, C)) | 0
-            H = G
-            G = F
-            F = E
-            E = (D + T1) | 0
-            D = C
-            C = B
-            B = A
-            A = (T1 + T2) | 0
+            const E1 = (D + T1) | 0
+            const A1 = (T1 + T2) | 0
+            const w1 = W[i + 1] = swap32(data[offset++])
+            const T3 = (G + sigma1(E1) + ch(E1, E, F) + K[i + 1] + w1) | 0
+            const T4 = (sigma0(A1) + maj(A1, A, B)) | 0
+            H = F
+            G = E
+            F = E1
+            E = (C + T3) | 0
+            D = B
+            C = A
+            B = A1
+            A = (T3 + T4) | 0
         }
 
-        for (i = N_inputWords; i < N_workWords; i++) {
-            const w = W[i] = (
+        for (i = N_inputWords; i < N_workWords; i += 2) {
+            const w0 = W[i] = (
                 gamma1(W[i - 2]) +
                 W[i - 7] +
                 gamma0(W[i - 15]) +
                 W[i - 16]
             ) | 0
-            const T1 = (H + sigma1(E) + ch(E, F, G) + K[i] + w) | 0
+            const T1 = (H + sigma1(E) + ch(E, F, G) + K[i] + w0) | 0
             const T2 = (sigma0(A) + maj(A, B, C)) | 0
-            H = G
-            G = F
-            F = E
-            E = (D + T1) | 0
-            D = C
-            C = B
-            B = A
-            A = (T1 + T2) | 0
+            const E1 = (D + T1) | 0
+            const A1 = (T1 + T2) | 0
+            const w1 = W[i + 1] = (
+                gamma1(W[i - 1]) +
+                W[i - 6] +
+                gamma0(W[i - 14]) +
+                W[i - 15]
+            ) | 0
+            const T3 = (G + sigma1(E1) + ch(E1, E, F) + K[i + 1] + w1) | 0
+            const T4 = (sigma0(A1) + maj(A1, A, B)) | 0
+            H = F
+            G = E
+            F = E1
+            E = (C + T3) | 0
+            D = B
+            C = A
+            B = A1
+            A = (T3 + T4) | 0
         }
 
         this.A = (A + this.A) | 0
