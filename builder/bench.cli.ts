@@ -3,7 +3,7 @@ import {MAKURANOSOSHI, SAMPLE_JSON} from "../test/utils/sample-text.ts"
 
 /**
  * Benchmark runner. Owns the measurement policy: performance.now(),
- * one discarded warm-up set, round-robin between adapters per set,
+ * one untimed warm-up repeat, seeded counterbalanced adapter order,
  * a yielded tick between measurements, then median and MAD.
  * Emits one NDJSON line per cell, then a Markdown table.
  */
@@ -15,12 +15,15 @@ const param = (key: string, def: string): string => {
 }
 
 const REPEAT = +param("REPEAT", "10000")
-const SETS = +param("SETS", "5")
+const SETS = +param("SETS", "10")
+const SEED = +param("SEED", "256")
 const TARGET = param("TARGET", "")
 
 // Garbage in, immediate stop: the caller chose the values.
-if (!(Number.isInteger(REPEAT) && REPEAT > 0 && Number.isInteger(SETS) && SETS > 0)) {
-    throw new Error(`invalid REPEAT=${param("REPEAT", "")} SETS=${param("SETS", "")}`)
+if (!(Number.isInteger(REPEAT) && REPEAT > 0 &&
+    Number.isInteger(SETS) && SETS > 0 &&
+    Number.isInteger(SEED) && SEED >= 0 && SEED <= 0xFFFFFFFF)) {
+    throw new Error(`invalid REPEAT=${param("REPEAT", "")} SETS=${param("SETS", "")} SEED=${param("SEED", "")}`)
 }
 
 const sleep = () => new Promise<void>(resolve => setTimeout(resolve, 0))
@@ -34,6 +37,26 @@ const median = (a: number[]): number => {
 }
 
 const mad = (a: number[], med: number): number => median(a.map(v => Math.abs(v - med)))
+
+// A compact deterministic PRNG keeps the adapter order reproducible in
+// every JavaScript runtime without adding a benchmark-only dependency.
+const mulberry32 = (seed: number) => (): number => {
+    let n = seed += 0x6D2B79F5
+    n = Math.imul(n ^ n >>> 15, n | 1)
+    n ^= n + Math.imul(n ^ n >>> 7, n | 61)
+    return ((n ^ n >>> 14) >>> 0) / 0x100000000
+}
+
+const shuffle = <T>(source: readonly T[], random: () => number): T[] => {
+    const values = [...source]
+    for (let i = values.length - 1; i > 0; i--) {
+        const j = Math.floor(random() * (i + 1))
+        const value = values[i]!
+        values[i] = values[j]!
+        values[j] = value
+    }
+    return values
+}
 
 // The result lands both on stdout and, when present, in the page's
 // <pre> so it can be copied on browsers without a console (iOS).
@@ -116,25 +139,30 @@ async function main(): Promise<void> {
     }
 
     const env = ("object" === typeof process && process.version) ? `node ${process.version}` : navigator.userAgent
-    out(`# ${env} REPEAT=${REPEAT} SETS=${SETS} TARGET=${TARGET || "(all)"}`)
+    out(`# ${env} REPEAT=${REPEAT} SETS=${SETS} SEED=${SEED} TARGET=${TARGET || "(all)"}`)
+
+    const random = mulberry32(SEED)
 
     for (const input of ["string", "binary"] as const) {
         const group = cells.filter(cell => cell.input === input)
         if (!group.length) continue
         tick(`# ${input} `)
-        // Adapters take turns within each set; the start index rotates
-        // per set so nobody is pinned to one position under drift. One
-        // untimed repeat precedes each timed run (first-load absorber);
-        // the median covers the slower JIT tiering.
-        for (let set = 1; set <= SETS; set++) {
-            for (let turn = 0; turn < group.length; turn++) {
-                const cell = group[(set + turn) % group.length]!
-                await cell.fn(1)
-                const start = performance.now()
-                await cell.fn(REPEAT)
-                cell.times.push(performance.now() - start)
-                tick("o")
-                await sleep()
+        // Each seeded shuffle is immediately followed by its reverse. Every
+        // adapter therefore has the same mean position within a complete
+        // pair, cancelling linear drift while varying neighbours per pair.
+        // An odd final set remains a reproducible unpaired shuffle.
+        for (let set = 0; set < SETS; set += 2) {
+            const order = shuffle(group, random)
+            const pair = (set + 1 < SETS) ? [order, [...order].reverse()] : [order]
+            for (const cellsInSet of pair) {
+                for (const cell of cellsInSet) {
+                    await cell.fn(1)
+                    const start = performance.now()
+                    await cell.fn(REPEAT)
+                    cell.times.push(performance.now() - start)
+                    tick("o")
+                    await sleep()
+                }
             }
         }
         tick("\n")
@@ -147,6 +175,7 @@ async function main(): Promise<void> {
             input: cell.input,
             impl: cell.impl,
             repeat: REPEAT,
+            seed: SEED,
             sets: cell.times.map(round),
             median: round(med),
             mad: round(mad(cell.times, med)),
