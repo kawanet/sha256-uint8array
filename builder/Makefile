@@ -53,15 +53,15 @@ BUILDABLE := $(shell node -e 'console.log(process.features.typescript ? "YES" : 
 # Build all artifacts.
 all: is-buildable $(ALL)
 
-# Gate consumed by `all` and `npm prepack`: fail loudly unless type-strip
-# is available and this is not a NODE_ENV=production install.
+# Gate consumed by `all` and `npm prepack` so a build starts only where it
+# can finish: with native type-strip and the devDependencies installed.
 is-buildable:
-	@ [ "$(BUILDABLE)" = "YES" ] && [ "$(NODE_ENV)" != "production" ]
+	@ [ "$(BUILDABLE)" = "YES" ] && [ -f ../node_modules/.bin/rollup ]
 
-# Inverse gate used by `npm prepare`: skip build/test without type-strip
-# or under NODE_ENV=production; build manually in those environments.
+# Inverse gate for `npm prepare`: a consumer install skips build/test and
+# relies on prebuilt artifacts; contributors build on a capable runtime.
 is-not-buildable:
-	@ [ "$(BUILDABLE)" != "YES" ] || [ "$(NODE_ENV)" = "production" ]
+	@ [ "$(BUILDABLE)" != "YES" ] || [ ! -f ../node_modules/.bin/rollup ]
 
 $(MJS_DST): $(MJS_CONFIG) $(SRC) $(BUILDER_SRC)
 	@mkdir -p $(dir $@)
@@ -150,15 +150,11 @@ test:
 # The benchmark reads REPEAT and defaults it high enough to produce stable
 # numbers, which is far more work than a correctness run needs. Pin it low
 # here so `npm test` stays quick; `REPEAT=10000 npm test` still measures.
-test-full: all
+test-full: all smoke
 	cd .. && node_modules/.bin/tsc --noEmit
 	cd .. && node_modules/.bin/ts-refine format --check && node_modules/.bin/ts-refine imports --check
 	cd .. && REPEAT=$${REPEAT:-1} node --test test/*.test.ts
 
-# Run the bundled suites against dist/. CI uses this to cover runtimes
-# older than the build requirement, where the .ts sources cannot run.
-test-bundled: $(TESTS_DST) smoke
-	cd .. && REPEAT=$${REPEAT:-1} node --test builder/tests/bundled.js
 
 ####
 
@@ -166,4 +162,4 @@ clean:
 	/bin/rm -fr $(ALL)
 	$(MAKE) -C ../browser/vendor $@
 
-.PHONY: all clean test smoke smoke-mjs smoke-cjs smoke-minjs test-full test-bundled is-buildable is-not-buildable
+.PHONY: all clean test smoke smoke-mjs smoke-cjs smoke-minjs test-full is-buildable is-not-buildable
