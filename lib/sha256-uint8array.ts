@@ -198,14 +198,10 @@ export class Hash {
         let i = 0
         offset = offset!! | 0
 
-        while (i < N_inputWords) {
-            W[i++] = swap32(data[offset++])
-        }
-
         for (i = 0; i < N_workWords; i++) {
             let w: number
             if (i < N_inputWords) {
-                w = W[i]
+                w = W[i] = swap32(data[offset++])
             } else {
                 const j = i & (N_inputWords - 1)
                 w = W[j] = (
