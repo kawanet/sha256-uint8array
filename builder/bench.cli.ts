@@ -192,11 +192,13 @@ async function main(): Promise<void> {
 
     for (const cell of cells) {
         const med = median(cell.times)
+        const ops = cell.repeat * cell.opsPerRepeat
         out(JSON.stringify({
             name: cell.name,
             input: cell.input,
             impl: cell.impl,
-            ops: cell.repeat * cell.opsPerRepeat,
+            ops,
+            ms: round(med * ops / 1000),
             sets: cell.times.map(round),
             median: round(med),
             mad: round(mad(cell.times, med)),
@@ -233,21 +235,20 @@ async function main(): Promise<void> {
         const medal = (v === sorted[0]) ? " 🥇" : (v === sorted[1]) ? " 🥈" : ""
         return `${Math.round(v * 20)}ms${medal}`
     }
-    out(`|module|string (ms/20K ops)|U8A (ms/20K ops)|`)
+    out(`|module|string|U8A|`)
     out(`|---|---|---|`)
     for (const row of rows) {
         out(`|${row.name}|${format(row, "string")}|${format(row, "u8a")}|`)
     }
 
-    // Legend for whichever markers the table actually used.
+    // Unit and legend for whichever markers the table actually used.
     const legend = [
+        "ms = milliseconds per 20K ops",
         noteShape && "▫️ input shape not supported",
         noteBench && "⁎₁ not benched on this platform",
     ].filter(Boolean).join(" / ")
-    if (legend) {
-        out("")
-        out(legend)
-    }
+    out("")
+    out(legend)
 }
 
 main().catch(err => {

@@ -106,9 +106,10 @@ open browser/bench.html   # ?DURATION=500&SETS=10&TARGET=sha256-uint8array
 ```
 
 The runner calibrates each cell towards `DURATION` milliseconds. It prints
-one JSON line per cell — ops per set, the measured sets in microseconds per
-op, their median and median absolute deviation — followed by a Markdown table
-normalized to milliseconds per 20,000 ops.
+one JSON line per cell — ops per set, its median duration in milliseconds,
+the measured sets in microseconds per op, their median and median absolute
+deviation — followed by a Markdown table normalized to milliseconds per
+20,000 ops.
 
 ## WEB BROWSERS
 
