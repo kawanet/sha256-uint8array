@@ -15,7 +15,9 @@ const here = (path: string): string => fileURLToPath(new URL(path, import.meta.u
 // shims, and the package name resolves to the global left behind by
 // dist/*.min.js, so the browser exercises the shipped bundle.
 const rollupConfig: RollupOptions = {
-    input: "../test/*.test.ts",
+    // 90.entrypoint tests require() the shipped files; Node-only, no browser
+    // shim, so the negative pattern keeps them out of the browser bundle.
+    input: ["../test/*.test.ts", "!../test/90.*"],
 
     /**
      * browser/tests.html
