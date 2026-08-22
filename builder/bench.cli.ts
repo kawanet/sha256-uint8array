@@ -42,6 +42,17 @@ const out = (line: string): void => {
     console.log(line)
 }
 
+// Progress: one character per finished measurement. Node writes to
+// stderr so stdout stays clean NDJSON; browsers append to the <pre>.
+const tick = (chunk: string): void => {
+    if ("object" === typeof document) {
+        const pre = document.getElementById("output")
+        if (pre) pre.textContent += chunk
+    } else {
+        process.stderr.write(chunk)
+    }
+}
+
 interface Cell {
     name: string;
     input: "string" | "binary" | "async";
@@ -95,6 +106,8 @@ async function main(): Promise<void> {
 
     for (const input of ["string", "binary", "async"] as const) {
         const group = cells.filter(cell => cell.input === input)
+        if (!group.length) continue
+        tick(`# ${input} `)
         // set 0 warms the JIT up and is discarded; adapters take turns
         // within each set so slow drift hits all of them equally.
         for (let set = 0; set <= SETS; set++) {
@@ -103,9 +116,11 @@ async function main(): Promise<void> {
                 await cell.fn(REPEAT)
                 const ms = performance.now() - start
                 if (set > 0) cell.times.push(ms)
+                tick("o")
                 await sleep()
             }
         }
+        tick("\n")
     }
 
     for (const cell of cells) {
@@ -122,15 +137,27 @@ async function main(): Promise<void> {
 
     // README-shaped summary: string and U8A columns, with the async
     // (crypto.subtle) result standing in the U8A column of its row.
-    const ms = (name: string, input: Cell["input"]): string => {
+    // The fastest and second-fastest cell per column take the medals.
+    const value = (name: string, input: Cell["input"]): number | null => {
         const cell = cells.find(c => c.name === name && c.input === input)
-        return cell ? `${Math.round(median(cell.times))}ms` : "N/A"
+        return cell ? median(cell.times) : null
+    }
+    const rows = picked.map(([name]) => ({
+        name,
+        string: value(name, "string"),
+        u8a: value(name, "binary") ?? value(name, "async"),
+    }))
+    const format = (row: (typeof rows)[number], col: "string" | "u8a"): string => {
+        const v = row[col]
+        if (v == null) return "N/A"
+        const sorted = rows.map(r => r[col]).filter(x => x != null).sort((x, y) => x - y)
+        const medal = (v === sorted[0]) ? " 🥇" : (v === sorted[1]) ? " 🥈" : ""
+        return `${Math.round(v)}ms${medal}`
     }
     out(`|module|string|U8A|`)
     out(`|---|---|---|`)
-    for (const [name] of picked) {
-        const u8a = cells.some(c => c.name === name && c.input === "binary") ? ms(name, "binary") : ms(name, "async")
-        out(`|${name}|${ms(name, "string")}|${u8a}|`)
+    for (const row of rows) {
+        out(`|${row.name}|${format(row, "string")}|${format(row, "u8a")}|`)
     }
 }
 

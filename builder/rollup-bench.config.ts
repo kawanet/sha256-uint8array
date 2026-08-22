@@ -23,7 +23,7 @@ const sucrasePlugin = () => sucrase({
 })
 
 const nodeConfig: RollupOptions = {
-    input: "./bench.ts",
+    input: "./bench.cli.ts",
 
     // Bare specifiers stay external; only relative paths are bundled.
     external: /^[^.\/]/,
@@ -56,7 +56,7 @@ const nodeConfig: RollupOptions = {
 }
 
 const browserConfig: RollupOptions = {
-    input: "./bench.ts",
+    input: "./bench.cli.ts",
 
     /**
      * browser/bench.html
