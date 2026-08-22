@@ -1,3 +1,4 @@
+import alias from "@rollup/plugin-alias"
 import multiEntry from "@rollup/plugin-multi-entry"
 import nodeResolve from "@rollup/plugin-node-resolve"
 import sucrase from "@rollup/plugin-sucrase"
@@ -21,6 +22,16 @@ const rollupConfig: RollupOptions = {
     treeshake: false,
 
     plugins: [
+        alias({
+            entries: [
+                // The suites import the entry point by relative path so they
+                // run on the .ts sources directly during development. Rewrite
+                // that to the package name here: it stays external, and the
+                // bundle resolves it through exports to dist/ at runtime.
+                {find: /^(\.\.\/)+lib\/sha256-uint8array\.ts$/, replacement: "sha256-uint8array"},
+            ],
+        }),
+
         multiEntry(),
 
         nodeResolve({
