@@ -1,10 +1,11 @@
 import * as A from "../test/utils/adapters.ts"
 import {MAKURANOSOSHI, SAMPLE_JSON} from "../test/utils/sample-text.ts"
+import {calibrateRepeat} from "./bench-calibrate.ts"
 
 /**
  * Benchmark runner. Owns the measurement policy: performance.now(),
- * one untimed warm-up repeat, seeded counterbalanced adapter order,
- * a yielded tick between measurements, then median and MAD.
+ * two-run duration calibration, seeded counterbalanced adapter order,
+ * a yielded tick between measurements, then median and MAD per op.
  * Emits one NDJSON line per cell, then a Markdown table.
  */
 
@@ -14,19 +15,19 @@ const param = (key: string, def: string): string => {
     return process.env[key] ?? def
 }
 
-const REPEAT = +param("REPEAT", "10000")
+const DURATION = +param("DURATION", "500")
 const SETS = +param("SETS", "10")
 const TARGET = param("TARGET", "")
 const SHUFFLE_SEED = 0x53484132 // ASCII "SHA2"
 
 // Garbage in, immediate stop: the caller chose the values.
-if (!(Number.isInteger(REPEAT) && REPEAT > 0 && Number.isInteger(SETS) && SETS > 0)) {
-    throw new Error(`invalid REPEAT=${param("REPEAT", "")} SETS=${param("SETS", "")}`)
+if (!(Number.isFinite(DURATION) && DURATION > 0 && Number.isInteger(SETS) && SETS > 0)) {
+    throw new Error(`invalid DURATION=${param("DURATION", "")} SETS=${param("SETS", "")}`)
 }
 
 const sleep = () => new Promise<void>(resolve => setTimeout(resolve, 0))
 const stringToArray = (str: string) => Array.from(unescape(encodeURIComponent(str)), (c: string) => c.charCodeAt(0))
-const round = (v: number) => Math.round(v * 10) / 10
+const round = (v: number) => Math.round(v * 100) / 100
 
 const median = (a: number[]): number => {
     const s = [...a].sort((x, y) => x - y)
@@ -82,7 +83,16 @@ interface Cell {
     input: "string" | "binary";
     impl: "sync" | "async";
     fn: (n: number) => (void | Promise<void>);
+    opsPerRepeat: number;
+    repeat: number;
     times: number[];
+}
+
+const measure = async (cell: Cell, repeat: number): Promise<number> => {
+    await cell.fn(1)
+    const start = performance.now()
+    await cell.fn(repeat)
+    return performance.now() - start
 }
 
 async function main(): Promise<void> {
@@ -129,21 +139,36 @@ async function main(): Promise<void> {
     const cells: Cell[] = []
     for (const [name, adapter] of picked) {
         const s = adapter.makeStringBench(stringPairs)
-        if (s) cells.push({name, input: "string", impl: "sync", fn: s, times: []})
+        if (s) cells.push({name, input: "string", impl: "sync", fn: s, opsPerRepeat: stringPairs.length, repeat: 0, times: []})
         const b = adapter.makeBinaryBench(binaryPairs)
         const a = b ? null : adapter.makeBinaryBenchAsync(binaryPairs)
-        if (b) cells.push({name, input: "binary", impl: "sync", fn: b, times: []})
-        else if (a) cells.push({name, input: "binary", impl: "async", fn: a, times: []})
+        if (b) cells.push({name, input: "binary", impl: "sync", fn: b, opsPerRepeat: binaryPairs.length, repeat: 0, times: []})
+        else if (a) cells.push({name, input: "binary", impl: "async", fn: a, opsPerRepeat: binaryPairs.length, repeat: 0, times: []})
     }
 
     const env = ("object" === typeof process && process.version) ? `node ${process.version}` : navigator.userAgent
-    out(`# ${env} REPEAT=${REPEAT} SETS=${SETS} TARGET=${TARGET || "(all)"}`)
+    out(`# ${env} DURATION=${DURATION}ms SETS=${SETS} TARGET=${TARGET || "(all)"} UNIT=us/op`)
 
     const random = mulberry32(SHUFFLE_SEED)
 
     for (const input of ["string", "binary"] as const) {
         const group = cells.filter(cell => cell.input === input)
         if (!group.length) continue
+        tick(`# ${input} calibrate `)
+        for (const cell of group) {
+            try {
+                cell.repeat = await calibrateRepeat(cell.opsPerRepeat, DURATION, async repeat => {
+                    const elapsed = await measure(cell, repeat)
+                    await sleep()
+                    return elapsed
+                })
+            } catch (err) {
+                const message = err instanceof Error ? err.message : String(err)
+                throw new Error(`${cell.name} ${cell.input}: ${message}`)
+            }
+            tick("o")
+        }
+        tick("\n")
         tick(`# ${input} `)
         // Each seeded shuffle is immediately followed by its reverse. Every
         // adapter therefore has the same mean position within a complete
@@ -154,10 +179,9 @@ async function main(): Promise<void> {
             const pair = (set + 1 < SETS) ? [order, [...order].reverse()] : [order]
             for (const cellsInSet of pair) {
                 for (const cell of cellsInSet) {
-                    await cell.fn(1)
-                    const start = performance.now()
-                    await cell.fn(REPEAT)
-                    cell.times.push(performance.now() - start)
+                    const elapsed = await measure(cell, cell.repeat)
+                    const ops = cell.repeat * cell.opsPerRepeat
+                    cell.times.push(elapsed * 1000 / ops)
                     tick("o")
                     await sleep()
                 }
@@ -172,7 +196,7 @@ async function main(): Promise<void> {
             name: cell.name,
             input: cell.input,
             impl: cell.impl,
-            repeat: REPEAT,
+            ops: cell.repeat * cell.opsPerRepeat,
             sets: cell.times.map(round),
             median: round(med),
             mad: round(mad(cell.times, med)),
@@ -207,9 +231,9 @@ async function main(): Promise<void> {
         }
         const sorted = rows.map(r => r[col]).filter(x => x != null).sort((x, y) => x - y)
         const medal = (v === sorted[0]) ? " 🥇" : (v === sorted[1]) ? " 🥈" : ""
-        return `${Math.round(v)}ms${medal}`
+        return `${Math.round(v * 20)}ms${medal}`
     }
-    out(`|module|string|U8A|`)
+    out(`|module|string (ms/20K ops)|U8A (ms/20K ops)|`)
     out(`|---|---|---|`)
     for (const row of rows) {
         out(`|${row.name}|${format(row, "string")}|${format(row, "u8a")}|`)

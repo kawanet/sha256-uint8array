@@ -99,14 +99,16 @@ npm run build
 npm run bench
 
 # options via environment variables
-REPEAT=10000 SETS=10 TARGET=sha256-uint8array,crypto-js npm run bench
+DURATION=500 SETS=10 TARGET=sha256-uint8array,crypto-js npm run bench
 
 # run the benchmark on a browser, options via the query string
-open browser/bench.html   # ?REPEAT=10000&SETS=10&TARGET=sha256-uint8array
+open browser/bench.html   # ?DURATION=500&SETS=10&TARGET=sha256-uint8array
 ```
 
-The runner prints one JSON line per cell — the measured sets, their median
-and the median absolute deviation — followed by the Markdown table above.
+The runner calibrates each cell towards `DURATION` milliseconds. It prints
+one JSON line per cell — ops per set, the measured sets in microseconds per
+op, their median and median absolute deviation — followed by a Markdown table
+normalized to milliseconds per 20,000 ops.
 
 ## WEB BROWSERS
 
