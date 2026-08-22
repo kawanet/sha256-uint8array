@@ -79,8 +79,9 @@ Node.js's native `crypto` module definitely runs faster than any others on Node.
 |[crypto.subtle.digest()](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)|-|N/A|1,484ms|N/A|57ms 🥇|
 
 The benchmark above shows milliseconds for 20,000 SHA-256 `hex` digests per
-cell, each the median of five runs. `REPEAT=10000` hashes two samples per
-round, a 1.9KB JSON string and a 0.9KB UTF-8 text. `N/A` marks an input shape
+cell: `REPEAT=10000` hashes two samples per round, a 1.9KB JSON string and a
+0.9KB UTF-8 text. Each cell is the median of five measured sets after one
+discarded warm-up set, taken in a single run. `N/A` marks an input shape
 the library does not accept, and `-` a library that hands the digest to Node's
 native `crypto` there instead of running its own JavaScript.
 It is tested on Linux aarch64, Node.js v24.19.0 and Chromium 151.
@@ -94,11 +95,17 @@ npm install
 npm run build
 
 # run the benchmark on Node.js
-REPEAT=10000 node --test test/99.benchmark.test.ts
+npm run bench
 
-# run tests and the benchmark on browser
-open browser/tests.html
+# options via environment variables
+REPEAT=10000 SETS=5 ONLY=self npm run bench
+
+# run the benchmark on a browser, options via the query string
+open browser/bench.html   # ?REPEAT=10000&SETS=5&ONLY=self
 ```
+
+The runner prints one JSON line per cell — the measured sets, their median
+and the median absolute deviation — followed by the Markdown table above.
 
 ## WEB BROWSERS
 

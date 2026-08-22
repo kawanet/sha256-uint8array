@@ -14,12 +14,14 @@ MINJS_DST := ../dist/sha256-uint8array.min.js
 PKG_DST   := ../dist/package.json
 TEST_DST  := ../browser/tests/bundled.js
 TESTS_DST := ../builder/tests/bundled.js
+BENCH_DST := ../builder/tests/bench.mjs ../browser/tests/bench.js
 
 MJS_CONFIG   := ./rollup-mjs.config.ts
 CJS_CONFIG   := ./rollup-cjs.config.ts
 MINJS_CONFIG := ./rollup-minjs.config.ts
 TEST_CONFIG  := ./rollup-test.config.ts
 TESTS_CONFIG := ./rollup-tests.config.ts
+BENCH_CONFIG := ./rollup-bench.config.ts
 
 # Documented named export that must be verified in every bundle.
 NAMED_EXPORTS := createHash
@@ -112,6 +114,17 @@ $(TESTS_DST): $(TESTS_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(MJS_DST)
 	@test "$$(wc -c < $@)" -le $(TEST_MAX_BYTES) || { echo "ERROR: $@ exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
+# Benchmark runner bundles, built on demand and not part of $(ALL).
+# One config builds both: the Node ESM and the browser IIFE.
+bench: $(BENCH_DST)
+
+$(BENCH_DST) &: $(BENCH_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(MJS_DST) $(MINJS_DST)
+	@mkdir -p ../builder/tests ../browser/tests
+	$(MAKE) -C ../browser/vendor
+	../node_modules/.bin/rollup -c $(BENCH_CONFIG)
+	@ls -l $(BENCH_DST)
+	@echo ""
+
 ####
 
 # Verify the bundles by importing/requiring the package itself.
@@ -162,4 +175,4 @@ clean:
 	/bin/rm -fr $(ALL)
 	$(MAKE) -C ../browser/vendor $@
 
-.PHONY: all clean test smoke smoke-mjs smoke-cjs smoke-minjs test-full is-buildable is-not-buildable
+.PHONY: all bench clean test smoke smoke-mjs smoke-cjs smoke-minjs test-full is-buildable is-not-buildable
