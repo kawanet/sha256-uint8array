@@ -11,23 +11,65 @@ import hashJs from "hash.js/lib/hash/sha/256.js"
 import {sha256 as jsSha256} from "js-sha256"
 import jsSha from "jssha/dist/sha256"
 import forgeSha from "node-forge/lib/sha256.js"
+import {strict as assert} from "node:assert"
 import * as nodeCrypto from "node:crypto"
 import shaJs from "sha.js/sha256.js"
 import {createHash as ownCreateHash} from "../../lib/sha256-uint8array.ts"
 import {arrayToHex} from "./utils.ts"
 
-export interface Adapter {
-    noString?: boolean;
-    noBinary?: boolean;
-    noDataView?: boolean;
-
-    hash(data: string | Uint8Array | ArrayBufferView): string;
+export interface BenchPair<T> {
+    data: T;
+    expect: string;
 }
 
-export interface AsyncAdapter {
-    noBinary?: boolean;
+/**
+ * Base class for the adapters below: each subclass provides hash(), and
+ * inherits the benchmark closure factories shared by the test suite and
+ * the benchmark runner.
+ */
+export abstract class Adapter {
+    // declare: type-only, so no own field shadows the subclass initializers
+    declare noString?: boolean;
+    declare noBinary?: boolean;
+    declare noDataView?: boolean;
+    declare noAsync?: boolean;
+    declare noBench?: boolean;
 
-    hash(data: Uint8Array<ArrayBuffer>): Promise<string>;
+    hash(_data: string | Uint8Array | ArrayBufferView): string {
+        throw new Error("hash() not supported")
+    }
+
+    hashAsync(_data: Uint8Array<ArrayBuffer>): Promise<string> {
+        throw new Error("hashAsync() not supported")
+    }
+
+    // Each call builds a fresh closure per adapter, so the hot loop's
+    // hash() call site keeps its own feedback vector and stays
+    // monomorphic; a loop shared on the prototype would go megamorphic
+    // and skew the comparison between adapters.
+    makeStringBench(pairs: BenchPair<string>[]): ((n: number) => void) | null {
+        if (this.noBench || this.noString) return null
+        return (n) => {
+            for (let i = 0; i < n; i++) {
+                for (const p of pairs) assert.equal(this.hash(p.data), p.expect)
+            }
+        }
+    }
+
+    makeBinaryBench(pairs: BenchPair<Uint8Array>[]): ((n: number) => void) | null {
+        if (this.noBench || this.noBinary) return null
+        return (n) => {
+            for (let i = 0; i < n; i++) {
+                for (const p of pairs) assert.equal(this.hash(p.data), p.expect)
+            }
+        }
+    }
+
+    // The async implementation of the binary input; only Promise-based
+    // adapters override this. The default states there is none.
+    makeBinaryBenchAsync(_pairs: BenchPair<Uint8Array<ArrayBuffer>>[]): ((n: number) => Promise<void>) | null {
+        return null
+    }
 }
 
 const isBrowser = ("undefined" !== typeof window)
@@ -38,7 +80,7 @@ const hasSubtle = ("undefined" !== typeof crypto) && crypto.subtle && ("function
  * https://github.com/kawanet/sha256-uint8array
  */
 
-export class SHA256Uint8Array implements Adapter {
+export class SHA256Uint8Array extends Adapter {
     private createHash = ownCreateHash;
 
     hash(data: string | Uint8Array | ArrayBufferView): string {
@@ -56,7 +98,7 @@ export class SHA256Uint8Array implements Adapter {
  * https://nodejs.org/api/crypto.html
  */
 
-export class Crypto implements Adapter {
+export class Crypto extends Adapter {
     private crypto = nodeCrypto;
     noString = isBrowser;
     noBinary = isBrowser;
@@ -73,7 +115,7 @@ export class Crypto implements Adapter {
  * https://www.npmjs.com/package/crypto-js
  */
 
-export class CryptoJs implements Adapter {
+export class CryptoJs extends Adapter {
     private CryptoJS = cryptoJs;
     noBinary = true;
 
@@ -86,7 +128,7 @@ export class CryptoJs implements Adapter {
  * https://www.npmjs.com/package/jssha
  */
 
-export class JsSHA implements Adapter {
+export class JsSHA extends Adapter {
     private sha256 = jsSha;
     noDataView = true;
 
@@ -102,7 +144,7 @@ export class JsSHA implements Adapter {
  * https://www.npmjs.com/package/sha.js
  */
 
-export class ShaJS implements Adapter {
+export class ShaJS extends Adapter {
     private sha256 = shaJs;
     noDataView = true;
 
@@ -115,7 +157,7 @@ export class ShaJS implements Adapter {
  * https://github.com/indutny/hash.js
  */
 
-export class HashJs implements Adapter {
+export class HashJs extends Adapter {
     private sha256 = hashJs;
     noDataView = true;
 
@@ -129,7 +171,7 @@ export class HashJs implements Adapter {
  * https://github.com/aws/aws-sdk-js-crypto-helpers/tree/master/packages/sha256-js
  */
 
-export class AwsCrypto implements Adapter {
+export class AwsCrypto extends Adapter {
     private Sha256 = awsSha256;
     noString = isLegacy;
     noBinary = isLegacy;
@@ -147,7 +189,7 @@ export class AwsCrypto implements Adapter {
  * Note: it rejects a string outright rather than guessing an encoding.
  */
 
-export class Noble implements Adapter {
+export class Noble extends Adapter {
     private sha256 = noble;
     noString = true;
     noDataView = true;
@@ -164,7 +206,7 @@ export class Noble implements Adapter {
  * pulls in the whole crypto suite.
  */
 
-export class NodeForge implements Adapter {
+export class NodeForge extends Adapter {
     private md = forgeSha;
     noBinary = true;
 
@@ -180,7 +222,7 @@ export class NodeForge implements Adapter {
  * https://www.npmjs.com/package/fast-sha256
  */
 
-export class FastSha256 implements Adapter {
+export class FastSha256 extends Adapter {
     private sha256 = fastSha256;
     noString = true;
     noDataView = true;
@@ -194,7 +236,11 @@ export class FastSha256 implements Adapter {
  * https://www.npmjs.com/package/js-sha256
  */
 
-export class JsSha256 implements Adapter {
+export class JsSha256 extends Adapter {
+    // On Node.js it delegates to the native crypto module, so benching
+    // it there would measure native code, not this library's JavaScript.
+    // The compat suite still verifies correctness on both platforms.
+    noBench = !isBrowser;
     private sha256 = jsSha256;
     noDataView = true;
 
@@ -207,12 +253,24 @@ export class JsSha256 implements Adapter {
  * https://developer.mozilla.org/docs/Web/API/SubtleCrypto
  */
 
-export class SubtleCrypto implements AsyncAdapter {
+export class SubtleCrypto extends Adapter {
+    // Both sync shapes stay opted out: this adapter only exists as the
+    // async interface, gated by its own flag below.
     noString = true;
-    noBinary = !hasSubtle;
+    noBinary = true;
+    noAsync = !hasSubtle;
 
-    async hash(data: Uint8Array<ArrayBuffer>): Promise<string> {
+    async hashAsync(data: Uint8Array<ArrayBuffer>): Promise<string> {
         const digest = await crypto.subtle.digest("SHA-256", data)
         return arrayToHex(new Uint8Array(digest))
+    }
+
+    makeBinaryBenchAsync(pairs: BenchPair<Uint8Array<ArrayBuffer>>[]): ((n: number) => Promise<void>) | null {
+        if (this.noBench || this.noAsync) return null
+        return async (n) => {
+            for (let i = 0; i < n; i++) {
+                for (const p of pairs) assert.equal(await this.hashAsync(p.data), p.expect)
+            }
+        }
     }
 }

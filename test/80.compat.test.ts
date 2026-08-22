@@ -31,6 +31,14 @@ describe(TITLE, () => {
     it("js-sha256", testFor(new A.JsSha256()))
 
     it("@aws-crypto/sha256-js", testFor(new A.AwsCrypto()))
+
+    // The async W3C interface sits outside the sync testFor() shape.
+    it("crypto.subtle.digest()", async (t: TestContext) => {
+        const adapter = new A.SubtleCrypto()
+        if (adapter.noAsync) return t.skip()
+        assert.equal(await adapter.hashAsync(new Uint8Array(0)), "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "empty")
+        assert.equal(await adapter.hashAsync(new Uint8Array([0x41])), "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd", "1 byte")
+    })
 })
 
 function testFor(adapter: A.Adapter) {
