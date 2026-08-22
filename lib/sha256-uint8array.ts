@@ -202,12 +202,20 @@ export class Hash {
             W[i++] = swap32(data[offset++])
         }
 
-        for (i = N_inputWords; i < N_workWords; i++) {
-            W[i] = (gamma1(W[i - 2]) + W[i - 7] + gamma0(W[i - 15]) + W[i - 16]) | 0
-        }
-
         for (i = 0; i < N_workWords; i++) {
-            const T1 = (H + sigma1(E) + ch(E, F, G) + K[i] + W[i]) | 0
+            let w: number
+            if (i < N_inputWords) {
+                w = W[i]
+            } else {
+                const j = i & (N_inputWords - 1)
+                w = W[j] = (
+                    gamma1(W[(i - 2) & (N_inputWords - 1)]) +
+                    W[(i - 7) & (N_inputWords - 1)] +
+                    gamma0(W[(i - 15) & (N_inputWords - 1)]) +
+                    W[j]
+                ) | 0
+            }
+            const T1 = (H + sigma1(E) + ch(E, F, G) + K[i] + w) | 0
             const T2 = (sigma0(A) + maj(A, B, C)) | 0
             H = G
             G = F
@@ -293,7 +301,7 @@ type NS = (num: number) => string
 type NN = (num: number) => number
 type N3N = (x: number, y: number, z: number) => number
 
-const W = new Int32Array(N_workWords)
+const W = new Int32Array(N_inputWords)
 
 let sharedBuffer: ArrayBuffer
 let sharedOffset: number = 0
