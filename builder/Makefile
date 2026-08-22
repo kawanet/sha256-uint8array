@@ -115,9 +115,8 @@ $(TESTS_DST): $(TESTS_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(MJS_DST)
 	@test "$$(wc -c < $@)" -le $(TEST_MAX_BYTES) || { echo "ERROR: $@ exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
-# Benchmark runner bundles. One rollup run emits both files, so the
-# recipe lives on the builder-side file alone: grouped targets (&:)
-# would say this directly but need GNU make 4.3, and macOS ships 3.81.
+# Benchmark runner bundles: one rollup run emits both files, and the
+# recipe lives on the builder-side file alone.
 bench: $(BUILDER_BENCH_DST) $(BROWSER_BENCH_DST)
 
 $(BUILDER_BENCH_DST): $(BENCH_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(BROWSER_SRC) $(MJS_DST) $(MINJS_DST)
@@ -126,13 +125,12 @@ $(BUILDER_BENCH_DST): $(BENCH_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(BROWSE
 	../node_modules/.bin/rollup -c $(BENCH_CONFIG)
 	@ls -l $@ $(BROWSER_BENCH_DST)
 	@test "$$(wc -c < $@)" -le $(TEST_MAX_BYTES) || { echo "ERROR: $@ exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
+	@test "$$(wc -c < $(BROWSER_BENCH_DST))" -le $(TEST_MAX_BYTES) || { echo "ERROR: $(BROWSER_BENCH_DST) exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
-# Tracks the builder-side file; re-runs rollup only if this side is
-# missing, e.g. deleted by hand.
+# Emitted by the same rollup run above; just assert it exists.
 $(BROWSER_BENCH_DST): $(BUILDER_BENCH_DST)
-	@test -f $@ || ../node_modules/.bin/rollup -c $(BENCH_CONFIG)
-	@test "$$(wc -c < $@)" -le $(TEST_MAX_BYTES) || { echo "ERROR: $@ exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
+	@ [ -f $@ ]
 
 ####
 
