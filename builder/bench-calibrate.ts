@@ -1,4 +1,5 @@
-const INITIAL_OPS = 1000
+const MIN_PROBE_OPS = 1000
+const PROBE_OPS_PER_MS = 10 // 10K ops / 100ms, divided by ten
 const MAX_OPS = 1_000_000_000
 
 type Measure = (repeat: number) => number | Promise<number>
@@ -12,6 +13,9 @@ const repeatForOps = (ops: number, opsPerRepeat: number): number => {
 }
 
 const elapsedOrThrow = (elapsed: number): number => {
+    if (elapsed === 0) {
+        throw new Error(`calibration timer did not advance; increase DURATION`)
+    }
     if (!(Number.isFinite(elapsed) && elapsed > 0)) {
         throw new Error(`invalid calibration elapsed=${elapsed}`)
     }
@@ -36,13 +40,13 @@ export async function calibrateRepeat(opsPerRepeat: number, duration: number, me
         throw new Error(`invalid DURATION=${duration}`)
     }
 
-    let repeat = repeatForOps(INITIAL_OPS, opsPerRepeat)
+    const probeOps = Math.max(MIN_PROBE_OPS, duration * PROBE_OPS_PER_MS)
+    let repeat = repeatForOps(probeOps, opsPerRepeat)
     let elapsed = await measure(repeat)
 
-    // A coarse browser timer can quantize a valid fast probe to zero.
-    // One 10x retry keeps that case distinct from a broken timer.
+    // The retry is target-sized under the probe's baseline assumption.
     if (elapsed === 0) {
-        repeat = repeatForOps(INITIAL_OPS * 10, opsPerRepeat)
+        repeat = repeatForOps(probeOps * 10, opsPerRepeat)
         elapsed = await measure(repeat)
     }
 

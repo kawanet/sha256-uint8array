@@ -6,15 +6,26 @@ import {calibrateRepeat} from "../builder/bench-calibrate.ts"
 const TITLE = "98.calibration.test.ts"
 
 describe(TITLE, () => {
-    it("uses two proportional projections", async () => {
+    it("uses a duration-scaled probe and two proportional projections", async () => {
         const calls: number[] = []
         const repeat = await calibrateRepeat(2, 500, (n) => {
             calls.push(n)
-            return calls.length === 1 ? 10 : 625
+            return calls.length === 1 ? 50 : 625
         })
 
-        assert.equal(calls.join(","), "500,25000")
+        assert.equal(calls.join(","), "2500,25000")
         assert.equal(repeat, 20000)
+    })
+
+    it("keeps a 1000-op floor for a short duration", async () => {
+        const calls: number[] = []
+        const repeat = await calibrateRepeat(2, 50, (n) => {
+            calls.push(n)
+            return n * 2 / 100
+        })
+
+        assert.equal(calls.join(","), "500,2500")
+        assert.equal(repeat, 2500)
     })
 
     it("retries a zero-duration probe with ten times the ops", async () => {
@@ -25,7 +36,7 @@ describe(TITLE, () => {
             return n * 2 / 100
         })
 
-        assert.equal(calls.join(","), "500,5000,25000")
+        assert.equal(calls.join(","), "2500,25000,25000")
         assert.equal(repeat, 25000)
     })
 
@@ -38,7 +49,7 @@ describe(TITLE, () => {
         }
 
         assert.ok(error instanceof Error)
-        assert.ok(/elapsed=0/.test(error.message))
+        assert.ok(/increase DURATION/.test(error.message))
     })
 
     it("rejects a projected ops count over the safety limit", async () => {
