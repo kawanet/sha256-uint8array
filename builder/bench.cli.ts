@@ -149,14 +149,26 @@ async function main(): Promise<void> {
         const cell = cells.find(c => c.name === name && c.input === input)
         return cell ? median(cell.times) : null
     }
-    const rows = picked.map(([name]) => ({
+    const rows = picked.map(([name, adapter]) => ({
         name,
+        adapter,
         string: value(name, "string"),
         u8a: value(name, "binary"),
     }))
+    // ⁎₁ = excluded from the bench on this platform (noBench);
+    // ▫️ = the library does not take this input shape at all.
+    let noteShape = false
+    let noteBench = false
     const format = (row: (typeof rows)[number], col: "string" | "u8a"): string => {
         const v = row[col]
-        if (v == null) return "N/A"
+        if (v == null) {
+            if (row.adapter.noBench) {
+                noteBench = true
+                return "⁎₁"
+            }
+            noteShape = true
+            return "▫️"
+        }
         const sorted = rows.map(r => r[col]).filter(x => x != null).sort((x, y) => x - y)
         const medal = (v === sorted[0]) ? " 🥇" : (v === sorted[1]) ? " 🥈" : ""
         return `${Math.round(v)}ms${medal}`
@@ -165,6 +177,16 @@ async function main(): Promise<void> {
     out(`|---|---|---|`)
     for (const row of rows) {
         out(`|${row.name}|${format(row, "string")}|${format(row, "u8a")}|`)
+    }
+
+    // Legend for whichever markers the table actually used.
+    const legend = [
+        noteShape && "▫️ input shape not supported",
+        noteBench && "⁎₁ not benched on this platform",
+    ].filter(Boolean).join(" / ")
+    if (legend) {
+        out("")
+        out(legend)
     }
 }
 

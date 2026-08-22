@@ -33,6 +33,7 @@ export abstract class Adapter {
     declare noBinary?: boolean;
     declare noDataView?: boolean;
     declare noAsync?: boolean;
+    declare noBench?: boolean;
 
     hash(_data: string | Uint8Array | ArrayBufferView): string {
         throw new Error("hash() not supported")
@@ -47,7 +48,7 @@ export abstract class Adapter {
     // monomorphic; a loop shared on the prototype would go megamorphic
     // and skew the comparison between adapters.
     makeStringBench(pairs: BenchPair<string>[]): ((n: number) => void) | null {
-        if (this.noString) return null
+        if (this.noBench || this.noString) return null
         return (n) => {
             for (let i = 0; i < n; i++) {
                 for (const p of pairs) assert.equal(this.hash(p.data), p.expect)
@@ -56,7 +57,7 @@ export abstract class Adapter {
     }
 
     makeBinaryBench(pairs: BenchPair<Uint8Array>[]): ((n: number) => void) | null {
-        if (this.noBinary) return null
+        if (this.noBench || this.noBinary) return null
         return (n) => {
             for (let i = 0; i < n; i++) {
                 for (const p of pairs) assert.equal(this.hash(p.data), p.expect)
@@ -236,6 +237,10 @@ export class FastSha256 extends Adapter {
  */
 
 export class JsSha256 extends Adapter {
+    // On Node.js it delegates to the native crypto module, so benching
+    // it there would measure native code, not this library's JavaScript.
+    // The compat suite still verifies correctness on both platforms.
+    noBench = !isBrowser;
     private sha256 = jsSha256;
     noDataView = true;
 
@@ -261,7 +266,7 @@ export class SubtleCrypto extends Adapter {
     }
 
     makeBinaryBenchAsync(pairs: BenchPair<Uint8Array<ArrayBuffer>>[]): ((n: number) => Promise<void>) | null {
-        if (this.noAsync) return null
+        if (this.noBench || this.noAsync) return null
         return async (n) => {
             for (let i = 0; i < n; i++) {
                 for (const p of pairs) assert.equal(await this.hashAsync(p.data), p.expect)
