@@ -67,14 +67,14 @@ Node.js's native `crypto` module definitely runs faster than any others on Node.
 |---|---|---|---|---|---|
 |[crypto](https://nodejs.org/api/crypto.html)|-|28ms 🥇|21ms 🥇|▫️|▫️|
 |[sha256-uint8array](http://github.com/kawanet/sha256-uint8array)|0.11.0|111ms 🥈|88ms 🥈|132ms 🥇|121ms 🥇|
-|[crypto-js](https://npmjs.com/package/crypto-js)|4.2.0|508ms|▫️| 429ms|▫️|
-|[jssha](https://npmjs.com/package/jssha)|3.3.2| 615ms|350ms| 409ms|298ms|
+|[crypto-js](https://npmjs.com/package/crypto-js)|4.2.0|508ms|▫️|429ms|▫️|
+|[jssha](https://npmjs.com/package/jssha)|3.3.2|615ms|350ms|409ms|298ms|
 |[hash.js](https://www.npmjs.com/package/hash.js)|1.1.7|640ms|633ms|461ms|415ms|
-|[sha.js](https://npmjs.com/package/sha.js)|2.4.12| 352ms|347ms| 418ms|192ms|
+|[sha.js](https://npmjs.com/package/sha.js)|2.4.12|352ms|347ms|418ms|192ms|
 |[@noble/hashes](https://www.npmjs.com/package/@noble/hashes)|2.3.0|▫️|118ms|▫️|160ms|
 |[node-forge](https://www.npmjs.com/package/node-forge)|1.4.0|533ms|▫️|418ms|▫️|
 |[fast-sha256](https://www.npmjs.com/package/fast-sha256)|1.3.0|▫️|123ms|▫️|147ms 🥈|
-|[js-sha256](https://www.npmjs.com/package/js-sha256)|1.0.0|⁎₁|⁎₁| 205ms|215ms|
+|[js-sha256](https://www.npmjs.com/package/js-sha256)|1.0.0|⁎₁|⁎₁|205ms|215ms|
 |[@aws-crypto/sha256-js](https://www.npmjs.com/package/@aws-crypto/sha256-js)|5.2.0|247ms|236ms|170ms 🥈|162ms|
 |[crypto.subtle.digest()](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)|-|▫️|1473ms|▫️|455ms|
 
