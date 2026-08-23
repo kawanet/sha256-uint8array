@@ -63,28 +63,28 @@ The W3C standard `crypto.subtle.digest()` API has a different interface which
 It runs well both on Node.js and browsers.
 Node.js's native `crypto` module definitely runs faster than any others on Node.js, though.
 
-|module|version|node.js V24 string|node.js V24 U8A|Chromium 151 string|Chromium 151 U8A|
+|module|version|Node.js v24 string|Node.js v24 U8A|Safari 26 string|Safari 26 U8A|
 |---|---|---|---|---|---|
-|[crypto](https://nodejs.org/api/crypto.html)|-|31ms 🥇|17ms 🥇|N/A|N/A|
-|[sha256-uint8array](http://github.com/kawanet/sha256-uint8array)|0.11.0|218ms 🥈|126ms|276ms 🥈|168ms|
-|[crypto-js](https://npmjs.com/package/crypto-js)|4.2.0|545ms|N/A|621ms|N/A|
-|[jssha](https://npmjs.com/package/jssha)|3.3.2|655ms|395ms|538ms|337ms|
-|[hash.js](https://www.npmjs.com/package/hash.js)|1.1.7|627ms|634ms|384ms|487ms|
-|[sha.js](https://npmjs.com/package/sha.js)|2.4.12|377ms|363ms|604ms|229ms|
-|[@noble/hashes](https://www.npmjs.com/package/@noble/hashes)|2.3.0|N/A|124ms 🥈|N/A|156ms|
-|[node-forge](https://www.npmjs.com/package/node-forge)|1.4.0|572ms|N/A|502ms|N/A|
-|[fast-sha256](https://www.npmjs.com/package/fast-sha256)|1.3.0|N/A|132ms|N/A|133ms 🥈|
-|[js-sha256](https://www.npmjs.com/package/js-sha256)|1.0.0|-|-|327ms|307ms|
-|[@aws-crypto/sha256-js](https://www.npmjs.com/package/@aws-crypto/sha256-js)|5.2.0|235ms|212ms|225ms 🥇|244ms|
-|[crypto.subtle.digest()](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)|-|N/A|1,484ms|N/A|57ms 🥇|
+|[crypto](https://nodejs.org/api/crypto.html)|-|28ms 🥇|21ms 🥇|▫️|▫️|
+|[sha256-uint8array](http://github.com/kawanet/sha256-uint8array)|0.11.0|111ms 🥈|88ms 🥈|132ms 🥇|121ms 🥇|
+|[crypto-js](https://npmjs.com/package/crypto-js)|4.2.0|508ms|▫️| 429ms|▫️|
+|[jssha](https://npmjs.com/package/jssha)|3.3.2| 615ms|350ms| 409ms|298ms|
+|[hash.js](https://www.npmjs.com/package/hash.js)|1.1.7|640ms|633ms|461ms|415ms|
+|[sha.js](https://npmjs.com/package/sha.js)|2.4.12| 352ms|347ms| 418ms|192ms|
+|[@noble/hashes](https://www.npmjs.com/package/@noble/hashes)|2.3.0|▫️|118ms|▫️|160ms|
+|[node-forge](https://www.npmjs.com/package/node-forge)|1.4.0|533ms|▫️|418ms|▫️|
+|[fast-sha256](https://www.npmjs.com/package/fast-sha256)|1.3.0|▫️|123ms|▫️|147ms 🥈|
+|[js-sha256](https://www.npmjs.com/package/js-sha256)|1.0.0|⁎₁|⁎₁| 205ms|215ms|
+|[@aws-crypto/sha256-js](https://www.npmjs.com/package/@aws-crypto/sha256-js)|5.2.0|247ms|236ms|170ms 🥈|162ms|
+|[crypto.subtle.digest()](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)|-|▫️|1473ms|▫️|455ms|
 
 The benchmark above shows the median of ten sets, normalized to milliseconds
 per 20,000 SHA-256 `hex` digests. Each cell uses a fixed operation count
-calibrated towards 500ms. Each repeat hashes two samples, a 1.9KB JSON string
-and a 0.9KB UTF-8 text; every measurement is preceded by one untimed repeat
+calibrated towards 500ms. Each repeat hashes two samples, a 2KB JSON string
+and a 1KB UTF-8 text; every measurement is preceded by one untimed repeat
 to absorb first-load effects. `▫️` marks an unsupported input shape, and `⁎₁`
 a cell excluded because it delegates to native crypto instead of JavaScript.
-It is tested on Linux aarch64, Node.js v24.19.0 and Chromium 151.
+It is tested on Apple M4, Node.js v24.19.0 and Safari 26.5.2.
 
 You could run the benchmark as below.
 
