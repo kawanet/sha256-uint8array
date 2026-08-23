@@ -155,6 +155,25 @@ export class Hash {
             let index = start
 
             while (offset < length && index < N_inputBytes) {
+                // Runs of ASCII land as whole words while the write stays
+                // word-aligned: four code units fold into one int32 store,
+                // replacing four byte stores and three loop trips. The
+                // first non-ASCII unit falls through to the scalar path,
+                // which may unalign the cursor until the next block.
+                if (!(index & 3)) {
+                    while (offset + 4 <= length && index + 4 <= N_inputBytes) {
+                        const c0 = text.charCodeAt(offset)
+                        if (c0 >= 0x80) break
+                        const c1 = text.charCodeAt(offset + 1)
+                        const c2 = text.charCodeAt(offset + 2)
+                        const c3 = text.charCodeAt(offset + 3)
+                        if ((c1 | c2 | c3) >= 0x80) break
+                        _word[index >> 2] = pack32(c0, c1, c2, c3)
+                        offset += 4
+                        index += 4
+                    }
+                    if (offset >= length || index >= N_inputBytes) break
+                }
                 let code = text.charCodeAt(offset++) | 0
                 if (code < 0x80) {
                     // ASCII characters
@@ -344,6 +363,13 @@ const hex32: NS = num => HEX[(num >>> 24)] + HEX[(num >>> 16) & 0xFF] + HEX[(num
 const swapLE: NN = (c => (((c << 24) & 0xff000000) | ((c << 8) & 0xff0000) | ((c >> 8) & 0xff00) | ((c >> 24) & 0xff)))
 const swapBE: NN = (c => c)
 const swap32: NN = isBE() ? swapBE : swapLE
+
+// Folds four ASCII bytes into one int32 in the platform's byte order,
+// so a word store lays them out exactly as four byte stores would.
+type N4N = (c0: number, c1: number, c2: number, c3: number) => number
+const packLE: N4N = (c0, c1, c2, c3) => (c0 | (c1 << 8) | (c2 << 16) | (c3 << 24))
+const packBE: N4N = (c0, c1, c2, c3) => ((c0 << 24) | (c1 << 16) | (c2 << 8) | c3)
+const pack32: N4N = isBE() ? packBE : packLE
 
 const ch: N3N = (x, y, z) => (z ^ (x & (y ^ z)))
 const maj: N3N = (x, y, z) => ((x & y) | (z & (x | y)))
