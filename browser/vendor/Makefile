@@ -1,5 +1,5 @@
 ALL := \
-	lib/@aws-crypto/sha256-js/build/index.js \
+	lib/@aws-crypto/sha256-js/build/main/index.js \
 	lib/@noble/hashes/sha2.js \
 	lib/@noble/hashes/utils.js \
 	lib/crypto-js/index.js \
