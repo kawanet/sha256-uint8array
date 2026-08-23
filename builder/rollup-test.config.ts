@@ -66,6 +66,7 @@ const rollupConfig: RollupOptions = {
                 {find: "node:test", replacement: here("./node-test.shim.ts")},
                 {find: "node:assert", replacement: here("./node-assert.shim.ts")},
                 {find: "node:crypto", replacement: here("./node-crypto.shim.ts")},
+                {find: "node:url", replacement: here("./node-url.shim.ts")},
                 {find: "sha256-uint8array", replacement: here("../browser/import.js")},
                 // The suites spell the entry as a relative path; same shim either way.
                 {find: /^(\.\.\/)+lib\/sha256-uint8array\.ts$/, replacement: here("../browser/import.js")},

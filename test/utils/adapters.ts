@@ -13,6 +13,7 @@ import jsSha from "jssha/dist/sha256"
 import forgeSha from "node-forge/lib/sha256.js"
 import {strict as assert} from "node:assert"
 import * as nodeCrypto from "node:crypto"
+import {pathToFileURL} from "node:url"
 import shaJs from "sha.js/sha256.js"
 import {createHash as ownCreateHash} from "../../lib/sha256-uint8array.ts"
 import {arrayToHex} from "./utils.ts"
@@ -34,6 +35,12 @@ export abstract class Adapter {
     declare noDataView?: boolean;
     declare noAsync?: boolean;
     declare noBench?: boolean;
+
+    // An adapter that has to load something before its first hash()
+    // overrides this. The runner awaits it once, before any measuring,
+    // so a module load never lands inside a timed window.
+    async setup(): Promise<void> {
+    }
 
     hash(_data: string | Uint8Array | ArrayBufferView): string {
         throw new Error("hash() not supported")
@@ -246,6 +253,47 @@ export class JsSha256 extends Adapter {
 
     hash(data: string | Uint8Array): string {
         return this.sha256(data)
+    }
+}
+
+/**
+ * A module named on the command line rather than a package this file
+ * knows about. It exists to compare builds of this package with each
+ * other — a published dist/, a branch build, the working tree — where
+ * every cell runs the same implementation and only the code differs,
+ * so the numbers answer "did this change help?" directly.
+ *
+ * Note: it expects the createHash() entry point this package documents,
+ * so it is not a general adapter for arbitrary modules.
+ */
+
+export class DynamicModule extends Adapter {
+    private readonly path: string;
+    private loaded: typeof ownCreateHash | null = null;
+
+    constructor(path: string) {
+        super()
+        this.path = path
+    }
+
+    override async setup(): Promise<void> {
+        const module = await import(pathToFileURL(this.path).href)
+        if ("function" !== typeof module.createHash) {
+            throw new Error(`${this.path}: no createHash export`)
+        }
+        this.loaded = module.createHash
+    }
+
+    hash(data: string | Uint8Array | ArrayBufferView): string {
+        const createHash = this.loaded
+        if (!createHash) throw new Error(`${this.path}: setup() not awaited`)
+        const hash = createHash()
+        if ("string" === typeof data) {
+            hash.update(data) // same call either way: update() is overloaded, not union-typed
+        } else {
+            hash.update(data)
+        }
+        return hash.digest("hex")
     }
 }
 
