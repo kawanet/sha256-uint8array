@@ -8,14 +8,12 @@ import {MAKURANOSOSHI, SAMPLE_JSON} from "./utils/sample-text.ts"
 // bundle does not need import.meta.
 const TITLE = "99.benchmark.test.ts"
 
-// This suite verifies the benchmark payloads themselves: the closures
-// builder/bench.cli.ts measures run here with a small REPEAT, so CI keeps
-// covering the measured code path. The numbers live in the runner;
-// this file asserts correctness only.
-const REPEAT = +(process.env.REPEAT || 100)
+// One pass each is enough to check the adapters for correctness.
+// Run builder/bench.cli.ts to measure the adapters over many repeats.
+const REPEAT = 1
 const stringToArray = (str: string) => Array.from(unescape(encodeURIComponent(str)), (c: string) => c.charCodeAt(0))
 
-describe(`REPEAT=${REPEAT} ${TITLE}`, () => {
+describe(TITLE, () => {
 
     const expectJSON = (new A.Crypto()).hash(SAMPLE_JSON)
     const expectUTF8 = (new A.Crypto()).hash(MAKURANOSOSHI)

@@ -167,14 +167,10 @@ test:
 		*) $(MAKE) test-full ;; \
 	esac
 
-# The benchmark reads REPEAT and defaults it high enough to produce stable
-# numbers, which is far more work than a correctness run needs. Pin it low
-# here so `npm test` stays quick; `REPEAT=10000 npm test` still measures.
 test-full: all smoke
 	cd .. && node_modules/.bin/tsc --noEmit
 	cd .. && node_modules/.bin/ts-refine format --check && node_modules/.bin/ts-refine imports --check
-	cd .. && REPEAT=$${REPEAT:-1} node --test test/*.test.ts
-
+	cd .. && node --test test/*.test.ts
 
 ####
 
