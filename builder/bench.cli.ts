@@ -132,7 +132,7 @@ async function main(): Promise<void> {
     // Named paths replace the comparison outright rather than filtering
     // it, so every cell then measures a build of this package and only
     // the code differs between them.
-    const named = PATHS.map((path): [string, A.Adapter] => [path, new A.DynamicModule(path)])
+    const named = PATHS.map((path): [string, A.Adapter] => [path, A.dynamicModule(path)])
 
     // TARGET picks modules by comma-separated substrings; the default
     // (empty) measures everything, and named paths skip it entirely.

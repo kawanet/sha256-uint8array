@@ -259,39 +259,35 @@ export class JsSha256 extends Adapter {
  * every cell runs the same implementation and only the code differs,
  * so the numbers answer "did this change help?" directly.
  *
+ * Each path gets a class of its own, for the same reason the benchmark
+ * closures above are built per adapter: one shared method would send
+ * every module's createHash, and the differently shaped hashes it
+ * returns, through the same call sites, so the compared builds would
+ * blend into each other's numbers instead of standing apart.
+ *
  * Note: it expects the createHash() entry point this package documents,
  * so it is not a general adapter for arbitrary modules.
  */
 
-export class DynamicModule extends Adapter {
-    private readonly path: string;
+export const dynamicModule = (path: string): Adapter => new class extends Adapter {
     private loaded: typeof ownCreateHash | null = null;
 
-    constructor(path: string) {
-        super()
-        this.path = path
-    }
-
     override async setup(): Promise<void> {
-        const module = await import(pathToFileURL(this.path).href)
+        const module = await import(pathToFileURL(path).href)
         if ("function" !== typeof module.createHash) {
-            throw new Error(`${this.path}: no createHash export`)
+            throw new Error(`${path}: no createHash export`)
         }
         this.loaded = module.createHash
     }
 
     hash(data: string | Uint8Array | ArrayBufferView): string {
         const createHash = this.loaded
-        if (!createHash) throw new Error(`${this.path}: setup() not awaited`)
+        if (!createHash) throw new Error(`${path}: setup() not awaited`)
         const hash = createHash()
-        if ("string" === typeof data) {
-            hash.update(data) // same call either way: update() is overloaded, not union-typed
-        } else {
-            hash.update(data)
-        }
+        hash.update(data)
         return hash.digest("hex")
     }
-}
+}()
 
 /**
  * https://developer.mozilla.org/docs/Web/API/SubtleCrypto
