@@ -43,7 +43,7 @@ It has a better compatibility with Node.js's `crypto` module in its smaller foot
 |[crypto-js](https://npmjs.com/package/crypto-js)|✅ OK|🚫 NO|🚫 NO|✅ OK|🚫 NO|66KB|
 |[jssha](https://npmjs.com/package/jssha)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|10KB|
 |[hash.js](https://www.npmjs.com/package/hash.js)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|7KB|
-|[sha.js](https://npmjs.com/package/sha.js)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|47KB|
+|[sha.js](https://npmjs.com/package/sha.js)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|52KB|
 |[@noble/hashes](https://www.npmjs.com/package/@noble/hashes)|🚫 NO|✅ OK|🚫 NO|✅ OK|✅ OK|11KB|
 |[node-forge](https://www.npmjs.com/package/node-forge)|✅ OK|🚫 NO|🚫 NO|✅ OK|🚫 NO|27KB|
 |[fast-sha256](https://www.npmjs.com/package/fast-sha256)|🚫 NO|✅ OK|🚫 NO|🚫 NO|✅ OK|6KB|
