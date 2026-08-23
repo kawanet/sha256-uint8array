@@ -67,8 +67,9 @@ const out = (line: string): void => {
     console.log(line)
 }
 
-// Progress: one character per finished measurement. Node writes to
-// stderr so stdout stays clean NDJSON; browsers append to the <pre>.
+// Progress: `c` for a calibrated cell, `o` for a landed measurement,
+// one line per input shape. Node writes to stderr so stdout stays clean
+// NDJSON; browsers append to the <pre>.
 const tick = (chunk: string): void => {
     if ("object" === typeof document) {
         const pre = document.getElementById("output")
@@ -147,14 +148,14 @@ async function main(): Promise<void> {
     }
 
     const env = ("object" === typeof process && process.version) ? `node ${process.version}` : navigator.userAgent
-    out(`# ${env} DURATION=${DURATION} SETS=${SETS} TARGET=${TARGET || "(all)"} UNIT=us/op`)
+    out(`# ${env} DURATION=${DURATION} SETS=${SETS} TARGET=${TARGET || "(all)"}`)
 
     const random = mulberry32(SHUFFLE_SEED)
 
     for (const input of ["string", "binary"] as const) {
         const group = cells.filter(cell => cell.input === input)
         if (!group.length) continue
-        tick(`# ${input} calibrate `)
+        tick(`# ${input} `)
         for (const cell of group) {
             try {
                 cell.repeat = await calibrateRepeat(cell.opsPerRepeat, DURATION, async repeat => {
@@ -166,10 +167,8 @@ async function main(): Promise<void> {
                 const message = err instanceof Error ? err.message : String(err)
                 throw new Error(`${cell.name} ${cell.input}: ${message}`)
             }
-            tick("o")
+            tick("c")
         }
-        tick("\n")
-        tick(`# ${input} `)
         // Each seeded shuffle is immediately followed by its reverse. Every
         // adapter therefore has the same mean position within a complete
         // pair, cancelling linear drift while varying neighbours per pair.
@@ -190,6 +189,9 @@ async function main(): Promise<void> {
         tick("\n")
     }
 
+    // One line per cell: `ops` is the operation count of a single set and
+    // `ms` that set's median duration, while `sets`, `median` and `mad`
+    // are all microseconds per operation.
     for (const cell of cells) {
         const med = median(cell.times)
         const ops = cell.repeat * cell.opsPerRepeat
