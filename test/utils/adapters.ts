@@ -92,11 +92,7 @@ export class SHA256Uint8Array extends Adapter {
 
     hash(data: string | Uint8Array | ArrayBufferView): string {
         const hash = this.createHash()
-        if ("string" === typeof data) {
-            hash.update(data) // same call either way: update() is overloaded, not union-typed
-        } else {
-            hash.update(data)
-        }
+        hash.update(data)
         return hash.digest("hex")
     }
 }

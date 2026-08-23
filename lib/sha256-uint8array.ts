@@ -81,6 +81,10 @@ export class Hash {
     update(data: string, encoding?: string): this;
     update(data: Uint8Array): this;
     update(data: ArrayBufferView): this;
+    // The implementation already sorts these out at run time. Declaring
+    // the union too lets a caller holding one hand it over directly,
+    // instead of narrowing it back down to satisfy the overloads.
+    update(data: string | Uint8Array | ArrayBufferView): this;
 
     update(data: string | Uint8Array | ArrayBufferView): this {
         // data: string

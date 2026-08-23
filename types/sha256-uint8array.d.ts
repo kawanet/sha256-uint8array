@@ -8,6 +8,7 @@ declare class Hash {
     update(data: string, encoding?: string): this;
     update(data: Uint8Array): this;
     update(data: ArrayBufferView): this;
+    update(data: string | Uint8Array | ArrayBufferView): this;
 
     digest(): Uint8Array;
     digest(encoding: string): string;
