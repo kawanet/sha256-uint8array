@@ -51,8 +51,8 @@ It has a better compatibility with Node.js's `crypto` module in its smaller foot
 |[@aws-crypto/sha256-js](https://www.npmjs.com/package/@aws-crypto/sha256-js)|✅ OK|✅ OK|🚫 NO|🚫 NO|✅ OK|16KB|
 |[crypto.subtle.digest()](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)|🚫 NO|✅ OK|✅ OK|🚫 NO|🚫 NO|-|
 
-The minified sizes are measured by `make -C browser/vendor`, which bundles
-each library for browsers and runs it through terser.
+The minified sizes are measured by `make -C browser/vendor sizes`, which bundles
+each library for browsers.
 
 The W3C standard `crypto.subtle.digest()` API has a different interface which
 [returns](https://github.com/microsoft/TypeScript/blob/master/lib/lib.dom.d.ts)
