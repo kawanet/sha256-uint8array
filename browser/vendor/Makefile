@@ -35,13 +35,11 @@ lib/%.min.js: lib/%.js
 	@ls -l $< $@
 
 # The figures the README compatibility table quotes, in KB.
-sizes: $(MINJS_DST) $(ALL:.js=.min.js)
-	@for f in $^; do \
+sizes: $(ALL:.js=.min.js)
+	$(MAKE) -C ../../builder smoke-minjs
+	@for f in $(MINJS_DST) $^; do \
 		printf '  %3dKB  %s\n' "$$(( ($$(wc -c < $$f) + 512) / 1024 ))" "$$f"; \
 	done
-
-$(MINJS_DST):
-	$(MAKE) -C ../../builder smoke-minjs
 
 ####
 
