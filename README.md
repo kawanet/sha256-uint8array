@@ -43,12 +43,12 @@ It has a better compatibility with Node.js's `crypto` module in its smaller foot
 |[crypto-js](https://npmjs.com/package/crypto-js)|✅ OK|🚫 NO|🚫 NO|✅ OK|🚫 NO|66KB|
 |[jssha](https://npmjs.com/package/jssha)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|10KB|
 |[hash.js](https://www.npmjs.com/package/hash.js)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|7KB|
-|[sha.js](https://npmjs.com/package/sha.js)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|47KB|
+|[sha.js](https://npmjs.com/package/sha.js)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|52KB|
 |[@noble/hashes](https://www.npmjs.com/package/@noble/hashes)|🚫 NO|✅ OK|🚫 NO|✅ OK|✅ OK|11KB|
 |[node-forge](https://www.npmjs.com/package/node-forge)|✅ OK|🚫 NO|🚫 NO|✅ OK|🚫 NO|27KB|
 |[fast-sha256](https://www.npmjs.com/package/fast-sha256)|🚫 NO|✅ OK|🚫 NO|🚫 NO|✅ OK|6KB|
 |[js-sha256](https://www.npmjs.com/package/js-sha256)|✅ OK|✅ OK|🚫 NO|✅ OK|✅ OK|8KB|
-|[@aws-crypto/sha256-js](https://www.npmjs.com/package/@aws-crypto/sha256-js)|✅ OK|✅ OK|🚫 NO|🚫 NO|✅ OK|14KB|
+|[@aws-crypto/sha256-js](https://www.npmjs.com/package/@aws-crypto/sha256-js)|✅ OK|✅ OK|🚫 NO|🚫 NO|✅ OK|16KB|
 |[crypto.subtle.digest()](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)|🚫 NO|✅ OK|✅ OK|🚫 NO|🚫 NO|-|
 
 The minified sizes are measured by `make -C browser/vendor`, which bundles
@@ -75,7 +75,7 @@ Node.js's native `crypto` module definitely runs faster than any others on Node.
 |[node-forge](https://www.npmjs.com/package/node-forge)|1.4.0|572ms|N/A|502ms|N/A|
 |[fast-sha256](https://www.npmjs.com/package/fast-sha256)|1.3.0|N/A|132ms|N/A|133ms 🥈|
 |[js-sha256](https://www.npmjs.com/package/js-sha256)|1.0.0|-|-|327ms|307ms|
-|[@aws-crypto/sha256-js](https://www.npmjs.com/package/@aws-crypto/sha256-js)|3.0.0|235ms|212ms|225ms 🥇|244ms|
+|[@aws-crypto/sha256-js](https://www.npmjs.com/package/@aws-crypto/sha256-js)|5.2.0|235ms|212ms|225ms 🥇|244ms|
 |[crypto.subtle.digest()](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)|-|N/A|1,484ms|N/A|57ms 🥇|
 
 The benchmark above shows the median of ten sets, normalized to milliseconds

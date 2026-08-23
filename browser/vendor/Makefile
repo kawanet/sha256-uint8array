@@ -1,5 +1,5 @@
 ALL := \
-	lib/@aws-crypto/sha256-js/build/index.js \
+	lib/@aws-crypto/sha256-js/build/main/index.js \
 	lib/@noble/hashes/sha2.js \
 	lib/@noble/hashes/utils.js \
 	lib/crypto-js/index.js \
@@ -11,6 +11,12 @@ ALL := \
 	lib/sha.js/sha256.js \
 
 ####
+
+# Some of the compared libraries reach for Buffer through safe-buffer,
+# which requires the "buffer" module by name. node-resolve is told not to
+# prefer builtins here, so it resolves that to the "buffer" devDependency:
+# without it the import is left external and the IIFE ends up calling
+# itself with an undefined argument, which throws as the page loads.
 
 # Derive rollup's --name from the target path: drop "@", turn "/", "-" and "."
 # into "_". $* only has a value while a recipe runs, so this must be = not :=.

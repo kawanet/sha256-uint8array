@@ -41,7 +41,7 @@ const rollupConfig: RollupOptions = {
         file: "../browser/tests/bundled.js",
         format: "iife",
         globals: {
-            "@aws-crypto/sha256-js": "aws_crypto_sha256_js_build_index",
+            "@aws-crypto/sha256-js": "aws_crypto_sha256_js_build_main_index",
             "@noble/hashes/sha2.js": "noble_hashes_sha2",
             "@noble/hashes/utils.js": "noble_hashes_utils",
             "crypto-js": "crypto_js_index",
