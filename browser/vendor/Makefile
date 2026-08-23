@@ -30,12 +30,12 @@ lib/%.js: ../../node_modules/%.js
 	-p 'commonjs' \
 	--failAfterWarnings --format iife $< -o $@
 
-lib/%.min.js: lib/%.js
+lib/%.minified.js: lib/%.js
 	../../node_modules/.bin/terser $< -o $@ -c -m
 	@ls -l $< $@
 
 # The figures the README compatibility table quotes, in KB.
-sizes: $(ALL:.js=.min.js)
+sizes: $(ALL:.js=.minified.js)
 	$(MAKE) -C ../../builder smoke-minjs
 	@for f in $(MINJS_DST) $^; do \
 		printf '  %3dKB  %s\n' "$$(( ($$(wc -c < $$f) + 512) / 1024 ))" "$$f"; \
