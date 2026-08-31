@@ -10,7 +10,10 @@ import {showFiles} from "./show-files.ts"
 // dist/ without needing type-strip. The .mjs suffix keeps the bundle ESM
 // even where no package.json is present to say so.
 const rollupConfig: RollupOptions = {
-    input: "../test/*.test.ts",
+    // The compat and benchmark suites import the compared vendor libraries
+    // statically from devDependencies, which the packed matrix lanes never
+    // install; the negative patterns keep those suites source-only.
+    input: ["../test/*.test.ts", "!../test/80.*", "!../test/99.*"],
 
     // Bare specifiers stay external; only relative paths are bundled.
     external: /^[^.\/]/,
