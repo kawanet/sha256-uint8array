@@ -24,6 +24,23 @@ const TARGET = param("TARGET", "")
 const PATHS = ("object" === typeof location) ? [] : process.argv.slice(2)
 const SHUFFLE_SEED = 0x53484132 // ASCII "SHA2"
 
+// Every other argument is a module to import, so a leading dash can only
+// be a mistyped option — worth refusing rather than trying to load.
+const USAGE = [
+    "usage: bench.cli.ts [module.mjs ...]",
+    "  DURATION=500  milliseconds each cell is calibrated towards",
+    "  SETS=10       measured sets per cell",
+    "  TARGET=       comma-separated name substrings, unused when modules are named",
+].join("\n")
+
+if (PATHS.includes("-h") || PATHS.includes("--help")) {
+    console.log(USAGE)
+    process.exit(0)
+}
+
+const dashed = PATHS.find(path => path.startsWith("-"))
+if (dashed) throw new Error(`unknown option: ${dashed}, try -h`)
+
 // Garbage in, immediate stop: the caller chose the values.
 if (!(Number.isFinite(DURATION) && DURATION > 0 && Number.isInteger(SETS) && SETS > 0)) {
     throw new Error(`invalid DURATION=${param("DURATION", "")} SETS=${param("SETS", "")}`)
