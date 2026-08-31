@@ -2,6 +2,9 @@ name: Node.js CI
 
 on: [ push, pull_request ]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,16 +15,23 @@ jobs:
         with:
           node-version: "24"
 
+      # 'npm install' runs 'prepare' (clean build); tests are skipped there
+      # via the npm_command check in the Makefile and run explicitly next.
       - run: npm install
-      - run: npm run build
       - run: npm test
+      - run: make -C builder/pack pack
+      - run: make -C builder/pack bundled
 
       - uses: actions/upload-artifact@v7
         with:
           name: build
+          # README.md anchors the artifact root: upload-artifact keeps paths
+          # relative to the common ancestor of everything listed.
           path: |
+            README.md
+            builder/pack/
             builder/tests/
-            dist/
+          if-no-files-found: error
           retention-days: 1
 
   test:
@@ -29,10 +39,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        # https://github.com/nodejs/release
         node-version: [ "18", "20", "22", "24", "26" ]
     steps:
-      - uses: actions/checkout@v7
-
       - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
@@ -42,5 +51,7 @@ jobs:
           name: build
           path: .
 
-      - run: npm install --ignore-scripts
-      - run: npm run test-bundled
+      # No checkout: the artifact is self-contained. Installing the packed
+      # tarball is itself the files/exports/engines consumer check.
+      - run: make -C builder/pack unpack
+      - run: make -C builder/pack test
