@@ -13,9 +13,25 @@ import jsSha from "jssha/dist/sha256"
 import forgeSha from "node-forge/lib/sha256.js"
 import {strict as assert} from "node:assert"
 import * as nodeCrypto from "node:crypto"
+import {pathToFileURL} from "node:url"
 import shaJs from "sha.js/sha256.js"
 import {createHash as ownCreateHash} from "../../lib/sha256-uint8array.ts"
 import {arrayToHex} from "./utils.ts"
+
+// update() is published one input shape at a time, so a caller holding
+// a union has to narrow it back down before every call — a test the
+// implementation then repeats internally. Naming the union it already
+// takes at run time lets the adapters hand theirs straight over: method
+// parameters are bivariant, so the published overloads satisfy this on
+// their own and the package keeps publishing exactly what it always has.
+interface IHash {
+    update(data: string | Uint8Array | ArrayBufferView): IHash;
+    digest(encoding: string): string;
+}
+
+type ICreateHash = (algorithm?: string) => IHash
+
+const hasCreateHash = (v: any): v is {createHash: ICreateHash} => ("function" === typeof v?.createHash)
 
 export interface BenchPair<T> {
     data: T;
@@ -34,6 +50,12 @@ export abstract class Adapter {
     declare noDataView?: boolean;
     declare noAsync?: boolean;
     declare noBench?: boolean;
+
+    // An adapter that has to load something before its first hash()
+    // overrides this. The runner awaits it once, before any measuring,
+    // so a module load never lands inside a timed window.
+    async setup(): Promise<void> {
+    }
 
     hash(_data: string | Uint8Array | ArrayBufferView): string {
         throw new Error("hash() not supported")
@@ -81,16 +103,10 @@ const hasSubtle = ("undefined" !== typeof crypto) && crypto.subtle && ("function
  */
 
 export class SHA256Uint8Array extends Adapter {
-    private createHash = ownCreateHash;
+    private createHash: ICreateHash = ownCreateHash;
 
     hash(data: string | Uint8Array | ArrayBufferView): string {
-        const hash = this.createHash()
-        if ("string" === typeof data) {
-            hash.update(data) // same call either way: update() is overloaded, not union-typed
-        } else {
-            hash.update(data)
-        }
-        return hash.digest("hex")
+        return this.createHash().update(data).digest("hex")
     }
 }
 
@@ -248,6 +264,42 @@ export class JsSha256 extends Adapter {
         return this.sha256(data)
     }
 }
+
+/**
+ * A module named on the command line rather than a package this file
+ * knows about. It exists to compare builds of this package with each
+ * other — a published dist/, a branch build, the working tree — where
+ * every cell runs the same implementation and only the code differs,
+ * so the numbers answer "did this change help?" directly.
+ *
+ * Each path gets a class of its own, for the same reason the benchmark
+ * closures above are built per adapter: one shared method would send
+ * every module's createHash, and the differently shaped hashes it
+ * returns, through the same call sites, so the compared builds would
+ * blend into each other's numbers instead of standing apart.
+ *
+ * Note: it expects the createHash() entry point this package documents,
+ * so it is not a general adapter for arbitrary modules.
+ */
+
+export const dynamicModule = (path: string): Adapter => new class extends Adapter {
+    private loaded: ICreateHash | null = null;
+
+    override async setup(): Promise<void> {
+        let module = await import(pathToFileURL(path).href)
+        if (!hasCreateHash(module)) module = module?.default
+        if (!hasCreateHash(module)) {
+            throw new Error(`${path}: no createHash export`)
+        }
+        this.loaded = module.createHash
+    }
+
+    hash(data: string | Uint8Array | ArrayBufferView): string {
+        const createHash = this.loaded
+        if (!createHash) throw new Error(`${path}: setup() not awaited`)
+        return createHash().update(data).digest("hex")
+    }
+}()
 
 /**
  * https://developer.mozilla.org/docs/Web/API/SubtleCrypto
