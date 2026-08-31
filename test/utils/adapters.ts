@@ -31,6 +31,8 @@ interface IHash {
 
 type ICreateHash = (algorithm?: string) => IHash
 
+const hasCreateHash = (v: any): v is {createHash: ICreateHash} => ("function" === typeof v?.createHash)
+
 export interface BenchPair<T> {
     data: T;
     expect: string;
@@ -284,8 +286,9 @@ export const dynamicModule = (path: string): Adapter => new class extends Adapte
     private loaded: ICreateHash | null = null;
 
     override async setup(): Promise<void> {
-        const module = await import(pathToFileURL(path).href) as {createHash?: ICreateHash}
-        if ("function" !== typeof module.createHash) {
+        let module = await import(pathToFileURL(path).href)
+        if (!hasCreateHash(module)) module = module?.default
+        if (!hasCreateHash(module)) {
             throw new Error(`${path}: no createHash export`)
         }
         this.loaded = module.createHash
