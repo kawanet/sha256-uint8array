@@ -43,7 +43,7 @@
     }
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=18.8.0"
   },
   "exports": {
     ".": {
@@ -85,7 +85,6 @@
     "prepack": "make -C builder is-buildable",
     "prepare": "make -C builder is-not-buildable 2> /dev/null || make -C builder clean all test",
     "test": "make -C builder test",
-    "test-bundled": "node --test builder/tests/bundled.js",
     "ts-refine": "./node_modules/.bin/ts-refine format && ./node_modules/.bin/ts-refine imports"
   },
   "sideEffects": false,
