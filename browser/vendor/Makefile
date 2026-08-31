@@ -36,7 +36,7 @@ lib/%.minified.js: lib/%.js
 
 # The figures the README compatibility table quotes, in KB.
 sizes: $(ALL:.js=.minified.js)
-	$(MAKE) -C ../../builder smoke-minjs
+	$(MAKE) -C ../../builder all
 	@for f in $(MINJS_DST) $^; do \
 		printf '  %3dKB  %s\n' "$$(( ($$(wc -c < $$f) + 512) / 1024 ))" "$$f"; \
 	done

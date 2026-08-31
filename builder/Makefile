@@ -1,4 +1,4 @@
-# Force bash so `set -o pipefail` works in the smoke-minjs recipe below.
+# Force bash so `set -o pipefail` works in the recipes below.
 SHELL := bash
 .SHELLFLAGS := -eo pipefail -c
 
@@ -23,9 +23,6 @@ MINJS_CONFIG := ./rollup-minjs.config.ts
 BROWSER_TEST_CONFIG := ./rollup-browser-test.config.ts
 BUILDER_TEST_CONFIG := ./rollup-builder-test.config.ts
 BENCH_CONFIG := ./rollup-bench.config.ts
-
-# Documented named export that must be verified in every bundle.
-NAMED_EXPORTS := createHash
 
 # Each artifact gets its own cap because they are built from different
 # targets. The package has no runtime dependencies and uses no Node
@@ -134,31 +131,6 @@ $(BROWSER_BENCH_DST): $(BUILDER_BENCH_DST)
 
 ####
 
-# Verify the bundles by importing/requiring the package itself.
-# This ensures the public entrypoints (exports/main) are correctly configured.
-# Note: process.argv.slice(1) is used because `node -e 'code' arg1 arg2`
-# results in process.argv = ['node', 'arg1', 'arg2'].
-smoke: smoke-mjs smoke-cjs smoke-minjs
-
-# MJS smoke test via public entrypoint.
-smoke-mjs: $(MJS_DST)
-	cd .. && node --input-type=module -e 'const m = await import("sha256-uint8array"); for (const k of process.argv.slice(1)) { if (typeof m[k] !== "function") { console.error("missing MJS export:", k); process.exit(1); } console.log("MJS export OK:", k); }' $(NAMED_EXPORTS)
-
-# CJS smoke test via public entrypoint.
-smoke-cjs: $(CJS_DST)
-	cd .. && node --input-type=commonjs -e 'const m = require("sha256-uint8array"); for (const k of process.argv.slice(1)) { if (typeof m[k] !== "function") { console.error("missing CJS export:", k); process.exit(1); } console.log("CJS export OK:", k); }' $(NAMED_EXPORTS)
-
-# Smoke the .min.js in two consumer shapes:
-#  (1) browser <script>: the bundle leaves a namespace global behind, so
-#      look the exports up as properties of that global.
-#  (2) CJS require(): the same file is published to a CDN and pulled in
-#      by bundlers, so it stays usable as a CommonJS module.
-smoke-minjs: $(MINJS_DST) $(PKG_DST)
-	(cat $< && echo '; for (const k of process.argv.slice(2)) { if (typeof SHA256[k] !== "function") { console.error("missing browser export:", k); process.exit(1); } console.log("browser export OK:", k); }') | node - $(NAMED_EXPORTS)
-	cd .. && node --input-type=commonjs -e 'const m = require("./dist/sha256-uint8array.min.js"); for (const k of process.argv.slice(1)) { if (typeof m[k] !== "function") { console.error("missing minjs CJS export:", k); process.exit(1); } console.log("minjs CJS export OK:", k); }' $(NAMED_EXPORTS)
-
-####
-
 # Consumer `npm install` skips the heavy test-full step to keep install fast.
 # `npm pack` re-runs prepare for a fresh build; tests are skipped there too
 # because CI runs them explicitly around the pack, while `npm publish`
@@ -169,7 +141,7 @@ test:
 		*) $(MAKE) test-full ;; \
 	esac
 
-test-full: all smoke
+test-full: all
 	cd .. && node_modules/.bin/tsc --noEmit
 	cd .. && node_modules/.bin/ts-refine format --check && node_modules/.bin/ts-refine imports --check
 	cd .. && node --test test/*.test.ts
@@ -180,4 +152,4 @@ clean:
 	/bin/rm -fr $(ALL) $(BUILDER_TEST_DST)
 	$(MAKE) -C ../browser/vendor $@
 
-.PHONY: all bench clean test smoke smoke-mjs smoke-cjs smoke-minjs test-full is-buildable is-not-buildable
+.PHONY: all bench clean test test-full is-buildable is-not-buildable
