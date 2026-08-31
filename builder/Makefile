@@ -13,7 +13,7 @@ CJS_DST   := ../dist/sha256-uint8array.cjs
 MINJS_DST := ../dist/sha256-uint8array.min.js
 PKG_DST   := ../dist/package.json
 BROWSER_TEST_DST := ../browser/tests/bundled.js
-BUILDER_TEST_DST := ../builder/tests/bundled.js
+BUILDER_TEST_DST := ./tests/bundled.mjs
 BUILDER_BENCH_DST := ../builder/tests/bench.mjs
 BROWSER_BENCH_DST := ../browser/tests/bench.js
 
