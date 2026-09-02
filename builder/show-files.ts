@@ -5,7 +5,7 @@ import type {Plugin} from "rollup"
 /**
  * Rollup plugin that logs every module the bundle pulls in.
  *
- * Output is normally just a handful of lines — the project's own `lib/`
+ * Output is normally just a handful of lines — the project's own source
  * files — so it does not clutter CI logs. The point is the inverse case:
  * if a misconfiguration starts dragging in a transitive dep tree or a
  * Node built-in, the import list balloons and is immediately visible.
