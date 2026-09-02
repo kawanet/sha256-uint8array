@@ -1,26 +1,29 @@
-// Browser-side stand-in for `node:assert`, aliased in by the rollup test
-// config. The suites import it as
-// `import {strict as assert} from "node:assert"`, so only the `strict`
-// surface they actually reach is provided here.
+// Browser-side shim for `node:assert`. Aliased into the test bundle
+// by the rollup test config. Tests source-import as
+// `import {strict as assert} from "node:assert"`, so this file
+// exports `strict` matching that surface.
 
 export const strict = {
-    // Mirrors `assert.ok(value, message?)`.
+    // Truthy check. Mirrors `assert.ok(value, message?)` in node:assert.
     ok(value: unknown, message?: string): void {
         if (!value) {
-            throw new Error(message || "expected truthy, got " + JSON.stringify(value))
+            throw new Error(message || `expected truthy, got ${JSON.stringify(value)}`)
         }
     },
 
-    // node:assert/strict `equal` compares with Object.is semantics, so
-    // NaN equals NaN and 0 does not equal -0 — both unlike `===`.
+    // node:assert/strict-compatible `equal`. Uses `Object.is`
+    // semantics, matching Node — so `equal(NaN, NaN)` passes and
+    // `equal(0, -0)` fails, both opposite of `===`.
     equal(actual: unknown, expected: unknown, message?: string): void {
         if (!Object.is(actual, expected)) {
-            throw new Error(message || "expected " + JSON.stringify(expected) + ", got " + JSON.stringify(actual))
+            throw new Error(message || `expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`)
         }
     },
 
-    // Verifies `block` throws. A RegExp is matched against the thrown
-    // message; an Error subclass is checked with instanceof.
+    // Verifies `block` throws. If `expected` is a RegExp the thrown
+    // message must match it; if it is an Error subclass the thrown
+    // value must be an instance of it. With no `expected` any throw
+    // counts.
     throws(block: () => void, expected?: RegExp | (new (...args: unknown[]) => Error)): void {
         let thrown: unknown
         let didThrow = false
@@ -36,17 +39,23 @@ export const strict = {
         if (expected instanceof RegExp) {
             const msg = thrown instanceof Error ? thrown.message : String(thrown)
             if (!expected.test(msg)) {
-                throw new Error("thrown message " + JSON.stringify(msg) + " did not match " + expected)
+                throw new Error(`thrown message ${JSON.stringify(msg)} did not match ${expected}`)
             }
-        } else if ("function" === typeof expected) {
+        } else if (typeof expected === "function") {
             if (!(thrown instanceof expected)) {
-                throw new Error("thrown is not an instance of " + expected.name)
+                throw new Error(`thrown is not an instance of ${expected.name}`)
             }
         }
     },
 
-    // Verifies `block` completes normally.
-    doesNotThrow(block: () => void): void {
-        block()
+    // Inverse of `throws` — surfaces the actual error to ease
+    // debugging instead of just reporting "did throw".
+    doesNotThrow(block: () => void, message?: string): void {
+        try {
+            block()
+        } catch (e) {
+            const detail = e instanceof Error ? e.message : String(e)
+            throw new Error(message ? `${message}: ${detail}` : `expected not to throw, got: ${detail}`)
+        }
     },
 }
