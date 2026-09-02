@@ -4,12 +4,15 @@ SHELL := bash
 
 PLAYWRIGHT_VERSION := 1.62.1
 
+MINJS_DST := ../dist/sha256-uint8array.min.js
+BROWSER_TEST_DST := ../browser/tests/bundled.js
+
 # The bundle rule, its size check, and its dependencies belong to the
 # repository-wide builder Makefile. This entry point is for browser CI.
 all: bundled
 
 bundled:
-	$(MAKE) -C ../builder ../browser/tests/bundled.js
+	$(MAKE) -C ../builder $(MINJS_DST) $(BROWSER_TEST_DST)
 
 # Keep Playwright out of package.json. CI installs it transiently alongside
 # the project's build dependencies, then downloads only the headless shell.
