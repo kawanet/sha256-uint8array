@@ -12,13 +12,14 @@ import type {Plugin} from "rollup"
  * That early signal is exactly why this plugin exists, so it should not
  * be mistaken for noise and removed.
  */
-export const showFiles = (): Plugin => {
+export const showFiles = (test?: {test: (path: string) => boolean}): Plugin => {
     const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "..")
 
     return {
         name: "show-files",
         load(id) {
             id = id.replace(projectRoot, "").replace(/^\//, "")
+            if (test && !test.test(id)) return
             console.warn(`import: ${id}`)
         },
     }
