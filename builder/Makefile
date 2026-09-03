@@ -149,7 +149,7 @@ test-full: all
 ####
 
 clean:
-	/bin/rm -fr $(ALL) $(BROWSER_BENCH_DST) $(BROWSER_TEST_DST) $(BUILDER_BENCH_DST) $(BUILDER_TEST_DST) $(PKG_DST)
+	/bin/rm -fr $(ALL) $(BROWSER_BENCH_DST) $(BROWSER_TEST_DST) $(BUILDER_BENCH_DST) $(BUILDER_TEST_DST)
 	$(MAKE) -C ../browser/vendor $@
 
 .PHONY: all bench clean test test-full is-buildable is-not-buildable
