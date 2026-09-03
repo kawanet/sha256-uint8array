@@ -34,14 +34,14 @@ CJS_MAX_BYTES   := 16000
 # The browser bundle is minified, so its cap is much tighter than the
 # unminified pair above and doubles as a regression guard on the size
 # the README advertises.
-MINJS_MAX_BYTES := 6000
+MINJS_MAX_BYTES := 5000
 
 # The browser test bundle carries the suites and the shims; every compared
 # implementation now loads separately from browser/vendor. The cap only
 # guards against a step change, such as a dependency slipping back in.
-TEST_MAX_BYTES := 60000
+TEST_MAX_BYTES := 50000
 
-ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST) $(BUILDER_BENCH_DST) $(BROWSER_BENCH_DST)
+ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST)
 
 # Build/test paths require Node's native TypeScript type-strip (default on
 # Node 22.18+). Older runtimes (e.g. Node 20) report BUILDABLE=NO and can
@@ -149,7 +149,7 @@ test-full: all
 ####
 
 clean:
-	/bin/rm -fr $(ALL) $(BROWSER_TEST_DST) $(BUILDER_TEST_DST) $(PKG_DST)
+	/bin/rm -fr $(ALL) $(BROWSER_BENCH_DST) $(BROWSER_TEST_DST) $(BUILDER_BENCH_DST) $(BUILDER_TEST_DST) $(PKG_DST)
 	$(MAKE) -C ../browser/vendor $@
 
 .PHONY: all bench clean test test-full is-buildable is-not-buildable
