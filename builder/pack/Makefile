@@ -31,7 +31,7 @@ bundled:
 	$(MAKE) -C .. $(BUILDER_TEST_DST)
 
 unpack:
-	cd ../.. && npm install ./builder/pack/packed.tgz --no-audit --no-fund --no-save
+	cd ../.. && npm install ./builder/pack/packed.tgz --no-audit --no-fund --no-save --engine-strict
 
 test: test-bundled test-iife
 
