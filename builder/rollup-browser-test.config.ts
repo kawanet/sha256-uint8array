@@ -11,65 +11,23 @@ import {showFiles} from "./show-files.ts"
 
 const here = (path: string): string => fileURLToPath(new URL(path, import.meta.url))
 
-// Bundles the test suites for browser/tests.html: Node builtins become
-// shims, and the package name resolves to the global left behind by
-// dist/*.min.js, so the browser exercises the shipped bundle.
 const rollupConfig: RollupOptions = {
-    // 90.entrypoint tests require() the shipped files; Node-only, no browser
-    // shim, so the negative pattern keeps them out of the browser bundle.
-    input: ["../test/*.test.ts", "!../test/90.*"],
+    input: ["../test/*.test.ts"],
 
-    /**
-     * browser/tests.html
-     * browser/vendor/Makefile
-     * test/utils/adapters.ts
-     */
-    external: [
-        "@aws-crypto/sha256-js",
-        "@noble/hashes/sha2.js",
-        "@noble/hashes/utils.js",
-        "crypto-js",
-        "fast-sha256",
-        "hash.js/lib/hash/sha/256.js",
-        "js-sha256",
-        "jssha/dist/sha256",
-        "node-forge/lib/sha256.js",
-        "sha.js/sha256.js",
-    ],
+    // Bare specifiers stay external; only relative paths are bundled.
+    external: v => /^[^./]/.test(v) && (v !== "multi-entry.js"),
 
     output: {
-        file: "../browser/tests/bundled.js",
-        format: "iife",
-        globals: {
-            "@aws-crypto/sha256-js": "aws_crypto_sha256_js_build_main_index",
-            "@noble/hashes/sha2.js": "noble_hashes_sha2",
-            "@noble/hashes/utils.js": "noble_hashes_utils",
-            "crypto-js": "crypto_js_index",
-            "fast-sha256": "fast_sha256_sha256",
-            "hash.js/lib/hash/sha/256.js": "hash_js_lib_hash_sha_256",
-            "js-sha256": "js_sha256_build_sha256",
-            "jssha/dist/sha256": "jssha_dist_sha256",
-            "node-forge/lib/sha256.js": "node_forge_lib_sha256",
-            "sha.js/sha256.js": "sha_js_sha256",
-        },
+        file: "../browser/tests/bundled.mjs",
+        format: "esm",
     },
 
     treeshake: false,
 
     plugins: [
-        // Everything the suites reach for that only exists on Node resolves
-        // to a local stand-in here. The package itself resolves to the shim
-        // that reads the global left behind by dist/*.min.js, so the browser
-        // run exercises the published artifact rather than the sources.
         alias({
             entries: [
-                {find: "node:test", replacement: here("./node-test.shim.ts")},
-                {find: "node:assert", replacement: here("./node-assert.shim.ts")},
-                {find: "node:crypto", replacement: here("./node-crypto.shim.ts")},
-                {find: "node:url", replacement: here("./node-url.shim.ts")},
-                {find: "sha256-uint8array", replacement: here("../browser/import.js")},
-                // The suites spell the entry as a relative path; same shim either way.
-                {find: /^(\.\.\/)+lib\/sha256-uint8array\.ts$/, replacement: here("../browser/import.js")},
+                {find: /^(\.\.\/)+lib\/sha256-uint8array\.ts$/, replacement: "sha256-uint8array"},
             ],
         }),
 

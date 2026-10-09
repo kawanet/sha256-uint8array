@@ -12,7 +12,7 @@ MJS_DST   := ../dist/sha256-uint8array.mjs
 CJS_DST   := ../dist/sha256-uint8array.cjs
 MINJS_DST := ../dist/sha256-uint8array.min.js
 PKG_DST   := ../dist/package.json
-BROWSER_TEST_DST := ../browser/tests/bundled.js
+BROWSER_TEST_DST := ../browser/tests/bundled.mjs
 BUILDER_TEST_DST := ./tests/bundled.mjs
 BUILDER_BENCH_DST := ../builder/tests/bench.mjs
 BROWSER_BENCH_DST := ../browser/tests/bench.js
@@ -24,21 +24,9 @@ BROWSER_TEST_CONFIG := ./rollup-browser-test.config.ts
 BUILDER_TEST_CONFIG := ./rollup-builder-test.config.ts
 BENCH_CONFIG := ./rollup-bench.config.ts
 
-# Each artifact gets its own cap because they are built from different
-# targets. The package has no runtime dependencies and uses no Node
-# builtins, so all three hold this repository's code alone — a sudden
-# jump means something was dragged in that does not belong.
 MJS_MAX_BYTES   := 16000
 CJS_MAX_BYTES   := 16000
-
-# The browser bundle is minified, so its cap is much tighter than the
-# unminified pair above and doubles as a regression guard on the size
-# the README advertises.
 MINJS_MAX_BYTES := 5000
-
-# The browser test bundle carries the suites and the shims; every compared
-# implementation now loads separately from browser/vendor. The cap only
-# guards against a step change, such as a dependency slipping back in.
 TEST_MAX_BYTES := 50000
 
 ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST)
@@ -92,9 +80,6 @@ $(PKG_DST):
 	@ls -l $@
 	@echo ""
 
-# Bundle loaded by browser/tests.html. The suites run unmodified: the
-# rollup config swaps the Node-only pieces for local stand-ins, and the
-# package resolves to the global that dist/*.min.js leaves behind.
 $(BROWSER_TEST_DST): $(BROWSER_TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(BROWSER_SRC) $(MINJS_DST)
 	@mkdir -p $(dir $@)
 	$(MAKE) -C ../browser/vendor
@@ -103,8 +88,6 @@ $(BROWSER_TEST_DST): $(BROWSER_TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(
 	@test "$$(wc -c < $@)" -le $(TEST_MAX_BYTES) || { echo "ERROR: $@ exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
-# Plain-JS bundle of the test suites, importing the package by name.
-# Runs against dist/ on any supported Node runtime without type-strip.
 $(BUILDER_TEST_DST): $(BUILDER_TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(MJS_DST)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<

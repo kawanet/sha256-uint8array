@@ -2,10 +2,8 @@
 SHELL := bash
 .SHELLFLAGS := -eo pipefail -c
 
-PLAYWRIGHT_VERSION := 1.62.1
-
 MINJS_DST := ../dist/sha256-uint8array.min.js
-BROWSER_TEST_DST := ../browser/tests/bundled.js
+BROWSER_TEST_DST := ../browser/tests/bundled.mjs
 
 # The bundle rule, its size check, and its dependencies belong to the
 # repository-wide builder Makefile. This entry point is for browser CI.
@@ -14,14 +12,14 @@ all: bundled
 bundled:
 	$(MAKE) -C ../builder $(MINJS_DST) $(BROWSER_TEST_DST)
 
-# Keep Playwright out of package.json. CI installs it transiently alongside
-# the project's build dependencies, then downloads only the headless shell.
 install:
-	cd .. && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install playwright@$(PLAYWRIGHT_VERSION) --no-save --ignore-scripts --no-audit --no-fund
-	cd .. && npx --no-install playwright install --with-deps --only-shell chromium
+	cd .. && node ./node_modules/.bin/playwright install chromium --only-shell --with-deps
 
-test: all
-	cd .. && node browser/tests.cli.mjs
+test: all install
+	cd .. && node ./node_modules/.bin/chromium-js \
+	--script dist/sha256-uint8array.min.js \
+	--import-map browser/import-map.json \
+	browser/tests/bundled.mjs
 
 # Browser bundle cleanup remains owned by builder/Makefile.
 clean:
