@@ -2,13 +2,13 @@
  * An interface which has digest() method
  */
 
-import {Sha256 as awsSha256} from "@aws-crypto/sha256-js"
+import aws from "@aws-crypto/sha256-js"
 import {sha256 as noble} from "@noble/hashes/sha2.js"
 import {bytesToHex} from "@noble/hashes/utils.js"
 import cryptoJs from "crypto-js"
 import fastSha256 from "fast-sha256"
 import hashJs from "hash.js/lib/hash/sha/256.js"
-import {sha256 as jsSha256} from "js-sha256"
+import jsSha256 from "js-sha256"
 import jsSha from "jssha/dist/sha256"
 import forgeSha from "node-forge/lib/sha256.js"
 import {strict as assert} from "node:assert"
@@ -17,6 +17,8 @@ import {pathToFileURL} from "node:url"
 import shaJs from "sha.js/sha256.js"
 import {createHash as ownCreateHash} from "../../lib/sha256-uint8array.ts"
 import {arrayToHex} from "./utils.ts"
+
+const {Sha256: awsSha256} = aws
 
 // update() is published one input shape at a time, so a caller holding
 // a union has to narrow it back down before every call — a test the

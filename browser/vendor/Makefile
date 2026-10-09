@@ -28,7 +28,7 @@ lib/%.js: ../../node_modules/%.js
 	../../node_modules/.bin/rollup --name $(NAME) \
 	-p 'node-resolve={browser:true,preferBuiltins:false}' \
 	-p 'commonjs' \
-	--failAfterWarnings --format iife $< -o $@
+	--failAfterWarnings --format esm $< -o $@
 
 lib/%.minified.js: lib/%.js
 	../../node_modules/.bin/terser $< -o $@ -c -m

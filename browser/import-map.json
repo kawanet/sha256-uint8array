@@ -1,0 +1,17 @@
+{
+  "imports": {
+    "node:crypto": "./node-crypto.shim.mjs",
+    "node:url": "./node-url.shim.mjs",
+    "@aws-crypto/sha256-js": "./vendor/lib/@aws-crypto/sha256-js/build/main/index.js",
+    "@noble/hashes/sha2.js": "./vendor/lib/@noble/hashes/sha2.js",
+    "@noble/hashes/utils.js": "./vendor/lib/@noble/hashes/utils.js",
+    "crypto-js": "./vendor/lib/crypto-js/index.js",
+    "fast-sha256": "./vendor/lib/fast-sha256/sha256.js",
+    "hash.js/lib/hash/sha/256.js": "./vendor/lib/hash.js/lib/hash/sha/256.js",
+    "js-sha256": "./vendor/lib/js-sha256/build/sha256.js",
+    "jssha/dist/sha256": "./vendor/lib/jssha/dist/sha256.js",
+    "node-forge/lib/sha256.js": "./vendor/lib/node-forge/lib/sha256.js",
+    "sha.js/sha256.js": "./vendor/lib/sha.js/sha256.js",
+    "sha256-uint8array": "./import.mjs"
+  }
+}

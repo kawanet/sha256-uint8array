@@ -3,6 +3,9 @@
   "description": "Fast SHA-256 digest hash based on Uint8Array, pure JavaScript.",
   "version": "0.12.1",
   "author": "Yusuke Kawasaki <u-suke@kawa.net>",
+  "allowScripts": {
+    "github:kawanet/test-assert-lite": true
+  },
   "bugs": {
     "url": "https://github.com/kawanet/sha256-uint8array/issues"
   },
@@ -29,6 +32,7 @@
     "jssha": "^3.3.2",
     "mocha": "^12.0.0",
     "node-forge": "^1.4.0",
+    "playwright-js-cli": "^0.1.0",
     "rollup": "^4.63.1",
     "sha.js": "^2.4.12",
     "terser": "^5.51.2",
@@ -56,6 +60,7 @@
     "LICENSE",
     "README.md",
     "browser/import.js",
+    "browser/import.mjs",
     "browser/package.json",
     "dist/package.json",
     "dist/sha256-uint8array.cjs",

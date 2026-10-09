@@ -5,18 +5,11 @@ import sucrase from "@rollup/plugin-sucrase"
 import type {RollupOptions} from "rollup"
 import {showFiles} from "./show-files.ts"
 
-// Bundles the test suites into a single plain-JS file that imports the
-// package by name, so any supported Node.js runtime can run them against
-// dist/ without needing type-strip. The .mjs suffix keeps the bundle ESM
-// even where no package.json is present to say so.
 const rollupConfig: RollupOptions = {
-    // The compat and benchmark suites import the compared vendor libraries
-    // statically from devDependencies, which the packed matrix lanes never
-    // install; the negative patterns keep those suites source-only.
     input: ["../test/*.test.ts", "!../test/80.*", "!../test/99.*"],
 
     // Bare specifiers stay external; only relative paths are bundled.
-    external: /^[^.\/]/,
+    external: v => /^[^./]/.test(v) && (v !== "multi-entry.js"),
 
     output: {
         file: "./tests/bundled.mjs",
@@ -28,10 +21,6 @@ const rollupConfig: RollupOptions = {
     plugins: [
         alias({
             entries: [
-                // The suites import the entry point by relative path so they
-                // run on the .ts sources directly during development. Rewrite
-                // that to the package name here: it stays external, and the
-                // bundle resolves it through exports to dist/ at runtime.
                 {find: /^(\.\.\/)+lib\/sha256-uint8array\.ts$/, replacement: "sha256-uint8array"},
             ],
         }),
