@@ -1,7 +1,6 @@
-import {describe, it} from "node:test"
-
 import {strict as assert} from "node:assert"
 import * as crypto from "node:crypto"
+import {describe, it} from "node:test"
 import {createHash} from "../lib/sha256-uint8array.ts"
 import {MAKURANOSOSHI} from "./utils/sample-text.ts"
 
