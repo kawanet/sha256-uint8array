@@ -1,0 +1,46 @@
+# Editor configuration, see http://editorconfig.org
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+max_line_length = 255
+tab_width = 4
+trim_trailing_whitespace = true
+
+[*.js]
+ij_javascript_blank_lines_after_imports = 1
+ij_javascript_blank_lines_around_class = 1
+ij_javascript_enforce_trailing_comma = whenmultiline
+ij_javascript_import_sort_members = false
+ij_javascript_keep_simple_blocks_in_one_line = true
+ij_javascript_space_after_generator_mult = true
+ij_javascript_space_before_function_left_parenth = true
+ij_javascript_space_before_generator_mult = false
+ij_javascript_spaces_within_object_type_braces = false
+ij_javascript_use_semicolon_after_statement = false
+
+[*.ts]
+ij_typescript_blank_lines_after_imports = 1
+ij_typescript_blank_lines_around_class = 1
+ij_typescript_enforce_trailing_comma = whenmultiline
+ij_typescript_import_sort_members = false
+ij_typescript_keep_simple_blocks_in_one_line = true
+ij_typescript_space_after_generator_mult = true
+ij_typescript_space_before_function_left_parenth = true
+ij_typescript_space_before_generator_mult = false
+ij_typescript_spaces_within_object_type_braces = false
+ij_typescript_use_semicolon_after_statement = false
+
+[*.json]
+indent_size = 2
+
+[*.yml]
+indent_size = 2
+
+[Makefile]
+indent_style = tab
