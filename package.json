@@ -1,7 +1,7 @@
 {
   "name": "sha256-uint8array",
   "description": "Fast SHA-256 digest hash based on Uint8Array, pure JavaScript.",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "author": "Yusuke Kawasaki <u-suke@kawa.net>",
   "bugs": {
     "url": "https://github.com/kawanet/sha256-uint8array/issues"
@@ -12,14 +12,14 @@
   "devDependencies": {
     "@aws-crypto/sha256-js": "^5.2.0",
     "@noble/hashes": "^2.3.0",
-    "@rollup/plugin-alias": "^6.0.0",
+    "@rollup/plugin-alias": "^6.0.1",
     "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-inject": "^5.0.5",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-multi-entry": "^7.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-sucrase": "^5.1.0",
-    "@rollup/plugin-terser": "^1.0.0",
+    "@rollup/plugin-terser": "^1.0.2",
     "@types/node": "^24.13.3",
     "buffer": "^6.0.3",
     "crypto-js": "^4.2.0",
@@ -27,12 +27,12 @@
     "hash.js": "^1.1.7",
     "js-sha256": "^1.0.0",
     "jssha": "^3.3.2",
-    "node-forge": "^1.4.0",
+    "node-forge": "^1.4.3",
     "playwright-js-cli": "^0.1.0",
-    "rollup": "^4.63.1",
+    "rollup": "^4.68.2",
     "sha.js": "^2.4.12",
     "terser": "^5.51.2",
-    "ts-refine": "^0.6.2",
+    "ts-refine": "^0.6.3",
     "typescript": "^6.0.3"
   },
   "devEngines": {
